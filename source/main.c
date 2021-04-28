@@ -17,17 +17,28 @@ typedef struct {
   u32 x;
   u32 y;
 } Player;
+Player p;
+Player p2;
 
-void updatePlayerSpriteEntry(Player *p) {
-  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
-  obj_set_pos(&sprite[0], p->x, p->y);
+void updatePlayerSpriteEntry(u32 i, Player *p) {
+  obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
+  obj_set_pos(&sprite[i], p->x, p->y);
 }
 
+void handle_serial() {
+  u32 remoteXY = REG_SIODATA32;
+  p2.x = (remoteXY >> 16);
+  p2.y = (remoteXY & 0x00FF);
+}
 
 int main() {
 
+  REG_RCNT = 0;
+  REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
+
   irq_init(NULL);
   irq_enable(II_VBLANK);
+  irq_add(II_SERIAL, handle_serial);
 
   oam_init(sprite, 128);
 
@@ -40,29 +51,39 @@ int main() {
 	dma3_cpy(&se_mem[0], mapMap, mapMapLen);
 	dma3_cpy(pal_bg_mem, mapPal, mapPalLen);
 
-  Player p;
   p.x = 93;
-  p.y = 70;
+  p.y = 55;
 
   while (1) {
     key_poll();
 
+    bool posChanged = false;
     if (key_is_down(KEY_RIGHT) && p.x < SCREEN_WIDTH - 16) {
       p.x++;
+      posChanged = true;
     }
     if (key_is_down(KEY_LEFT) && p.x > 0) {
       p.x--;
+      posChanged = true;
     }
     if (key_is_down(KEY_UP) && p.y > 0) {
       p.y--;
+      posChanged = true;
     }
     if (key_is_down(KEY_DOWN) && p.y < SCREEN_HEIGHT - 32) {
       p.y++;
+      posChanged = true;
+    }
+
+    if (posChanged) {
+      REG_SIODATA32 = (p.x << 16) | p.y;
+      REG_SIOCNT |= SION_ENABLE;
     }
 
     VBlankIntrWait();
 
-    updatePlayerSpriteEntry(&p);
+    updatePlayerSpriteEntry(0, &p);
+    updatePlayerSpriteEntry(1, &p2);
     oam_copy(oam_mem, sprite, 128);
   }
 }
