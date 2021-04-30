@@ -1,7 +1,10 @@
-
 #include <tonc.h>
 
 #include "all_gfx.h"
+#include "protos/network_messages.pb.h"
+#include "protos/world_object.pb.h"
+#include <pb_encode.h>
+#include <pb_decode.h>
 
 OBJ_ATTR sprite[128];
 
@@ -31,6 +34,15 @@ void handle_serial() {
   p2.y = (remoteXY & 0x00FF);
 }
 
+bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg) {
+  WorldObject message = WorldObject_init_zero;
+  pb_decode(stream, WorldObject_fields, &message);
+  p2.x = message.x;
+  p2.y = message.y;
+
+  return true;
+}
+
 int main() {
 
   REG_RCNT = 0;
@@ -53,6 +65,13 @@ int main() {
 
   p.x = 93;
   p.y = 55;
+
+  uint8_t buffer[128] = {0x0a, 0x06, 0x08, 0x01, 0x10, 0x2f, 0x18, 0x28};
+  size_t message_length = 8;
+  ServerUpdate message = ServerUpdate_init_zero;
+  pb_istream_t stream = pb_istream_from_buffer(buffer, message_length);
+  message.world_object.funcs.decode = decode_world_object;
+  pb_decode(&stream, ServerUpdate_fields, &message);
 
   while (1) {
     key_poll();
