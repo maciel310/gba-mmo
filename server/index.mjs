@@ -1,9 +1,17 @@
 import {createSocket} from 'dgram';
+import protobuf from 'protobufjs';
+
 import Npc from './npc.mjs';
 
 const server = createSocket('udp4');
 
 const TICK_INTERVAL_MS = 1000 / 10;
+
+const root = protobuf.loadSync([
+  '../gba-mmo-protos/world_object.proto',
+  '../gba-mmo-protos/network_messages.proto'
+]);
+const ServerUpdate = root.lookupType('ServerUpdate');
 
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
@@ -11,7 +19,7 @@ const clientList = new Map();
 const npcs = [];
 
 const mayor = new Npc(
-    {x: 40, y: 40}, 10,
+    1, {x: 40, y: 40}, 10,
     [{x: 1, y: 0}, {x: -1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}]);
 
 npcs.push(mayor);
@@ -37,13 +45,19 @@ server.on('message', (message, clientInfo) => {
 });
 
 setInterval(() => {
-  for (const clientInfo of clientList.values()) {
-    server.send(`${p1Pos.y},${p1Pos.x}`, clientInfo.port, clientInfo.address);
-  }
+  const worldObjects = [];
 
   npcs.forEach((npc) => {
     npc.tick();
+    worldObjects.push(npc.toWorldObject());
   });
+
+  // TODO: Limit update size to 512 bytes per UDP message.
+  const update = ServerUpdate.encode({worldObject: worldObjects}).finish();
+
+  for (const clientInfo of clientList.values()) {
+    server.send(update, clientInfo.port, clientInfo.address);
+  }
 }, TICK_INTERVAL_MS);
 
 server.bind(5465);
