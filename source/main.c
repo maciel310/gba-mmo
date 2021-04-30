@@ -28,12 +28,6 @@ void updatePlayerSpriteEntry(u32 i, Player *p) {
   obj_set_pos(&sprite[i], p->x, p->y);
 }
 
-void handle_serial() {
-  u32 remoteXY = REG_SIODATA32;
-  p2.x = (remoteXY >> 16);
-  p2.y = (remoteXY & 0x00FF);
-}
-
 bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg) {
   WorldObject message = WorldObject_init_zero;
   pb_decode(stream, WorldObject_fields, &message);
@@ -41,6 +35,33 @@ bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **a
   p2.y = message.y;
 
   return true;
+}
+
+size_t message_length = 0;
+size_t expected_message_length = 0;
+u8 buffer[128];
+void handle_serial() {
+  u32 data = REG_SIODATA32;
+  if (expected_message_length == 0) {
+    expected_message_length = data;
+    message_length = 0;
+    return;
+  }
+
+  buffer[message_length++] = ((data >> 24) & 0xff);
+  buffer[message_length++] = ((data >> 16) & 0xff);
+  buffer[message_length++] = ((data >> 8) & 0xff);
+  buffer[message_length++] = (data & 0xff);
+
+  if (message_length >= expected_message_length) {
+    ServerUpdate message = ServerUpdate_init_zero;
+    pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length);
+    message.world_object.funcs.decode = decode_world_object;
+    pb_decode(&stream, ServerUpdate_fields, &message);
+
+    expected_message_length = 0;
+    message_length = 0;
+  }
 }
 
 int main() {
@@ -66,12 +87,12 @@ int main() {
   p.x = 93;
   p.y = 55;
 
-  uint8_t buffer[128] = {0x0a, 0x06, 0x08, 0x01, 0x10, 0x2f, 0x18, 0x28};
-  size_t message_length = 8;
-  ServerUpdate message = ServerUpdate_init_zero;
-  pb_istream_t stream = pb_istream_from_buffer(buffer, message_length);
-  message.world_object.funcs.decode = decode_world_object;
-  pb_decode(&stream, ServerUpdate_fields, &message);
+  REG_SIODATA32 = 8;
+  handle_serial();
+  REG_SIODATA32 = 0x0a060801;
+  handle_serial();
+  REG_SIODATA32 = 0x102f1828;
+  handle_serial();
 
   while (1) {
     key_poll();
