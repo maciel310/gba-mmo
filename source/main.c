@@ -5,6 +5,7 @@
 #include "protos/world_object.pb.h"
 #include <pb_encode.h>
 #include <pb_decode.h>
+#include "world_objects.h"
 
 OBJ_ATTR sprite[128];
 
@@ -15,8 +16,8 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][0], characterTiles, characterTilesLen);
 }
 
-
 typedef struct {
+  u32 object_id;
   u32 x;
   u32 y;
 } Player;
@@ -31,8 +32,7 @@ void updatePlayerSpriteEntry(u32 i, Player *p) {
 bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg) {
   WorldObject message = WorldObject_init_zero;
   pb_decode(stream, WorldObject_fields, &message);
-  p2.x = message.x;
-  p2.y = message.y;
+  update_world_object(message);
 
   return true;
 }
@@ -87,11 +87,15 @@ int main() {
   p.x = 93;
   p.y = 55;
 
-  REG_SIODATA32 = 8;
+  REG_SIODATA32 = 16;
+  handle_serial();
+  REG_SIODATA32 = 0x0a060802;
+  handle_serial();
+  REG_SIODATA32 = 0x10291828;
   handle_serial();
   REG_SIODATA32 = 0x0a060801;
   handle_serial();
-  REG_SIODATA32 = 0x102f1828;
+  REG_SIODATA32 = 0x10651864;
   handle_serial();
 
   while (1) {
