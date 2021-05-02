@@ -4,15 +4,7 @@
 
 #include "world_objects.h"
 
-struct world_object {
-  u32 object_id;
-  u32 x;
-  u32 y;
-
-  struct world_object* next;
-};
-
-struct world_object* head = NULL;
+struct world_object* world_object_head = NULL;
 
 struct world_object* convert_world_object(WorldObject o) {
   struct world_object* new_object = (struct world_object*) malloc(sizeof(struct world_object));
@@ -25,12 +17,12 @@ struct world_object* convert_world_object(WorldObject o) {
 }
 
 void update_world_object(WorldObject o) {
-  if (head == NULL) {
-    head = convert_world_object(o);
+  if (world_object_head == NULL) {
+    world_object_head = convert_world_object(o);
     return;
   }
 
-  struct world_object* current = head;
+  struct world_object* current = world_object_head;
   struct world_object* previous = NULL;
   while (current != NULL) {
     if (current->object_id == o.object_id) {
@@ -40,7 +32,7 @@ void update_world_object(WorldObject o) {
     } else if (current->object_id > o.object_id) {
       struct world_object* new_object = convert_world_object(o);
       if (previous == NULL) {
-        head = new_object;
+        world_object_head = new_object;
       } else {
         previous->next = new_object;
       }

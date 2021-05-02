@@ -22,11 +22,15 @@ typedef struct {
   u32 y;
 } Player;
 Player p;
-Player p2;
 
-void updatePlayerSpriteEntry(u32 i, Player *p) {
+void updatePlayerSpriteEntry(Player *p) {
+  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
+  obj_set_pos(&sprite[0], p->x, p->y);
+}
+
+void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
-  obj_set_pos(&sprite[i], p->x, p->y);
+  obj_set_pos(&sprite[i], o->x, o->y);
 }
 
 bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg) {
@@ -87,18 +91,27 @@ int main() {
   p.x = 93;
   p.y = 55;
 
-  REG_SIODATA32 = 16;
-  handle_serial();
-  REG_SIODATA32 = 0x0a060802;
-  handle_serial();
-  REG_SIODATA32 = 0x10291828;
-  handle_serial();
-  REG_SIODATA32 = 0x0a060801;
-  handle_serial();
-  REG_SIODATA32 = 0x10651864;
-  handle_serial();
+  u32 serial_data[14][5] = {
+    {16, 0x0a060801, 0x10291828, 0x0a060802, 0x10651864},
+    {16, 0x0a060801, 0x102a1828, 0x0a060802, 0x10661864},
+    {16, 0x0a060801, 0x102a1829, 0x0a060802, 0x10671864},
+    {16, 0x0a060801, 0x102a182a, 0x0a060802, 0x10681864},
+    {16, 0x0a060801, 0x102a182b, 0x0a060802, 0x10691864},
+    {16, 0x0a060801, 0x102a182c, 0x0a060802, 0x106a1864},
+    {16, 0x0a060801, 0x102a182d, 0x0a060802, 0x106b1864},
+    {16, 0x0a060801, 0x102a182e, 0x0a060802, 0x106b1865},
+    {16, 0x0a060801, 0x102a182f, 0x0a060802, 0x106b1866},
+    {16, 0x0a060801, 0x102a1830, 0x0a060802, 0x106b1867},
+    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b1868},
+    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b1869},
+    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b186a},
+    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b186b},
+  };
+  u32 serial_data_index = 0;
 
+  u32 i;
   while (1) {
+
     key_poll();
 
     bool posChanged = false;
@@ -124,10 +137,25 @@ int main() {
       REG_SIOCNT |= SION_ENABLE;
     }
 
+    for (i = 0; i < 5; i++) {
+      REG_SIODATA32 = serial_data[serial_data_index][i];
+      handle_serial();
+    }
+    serial_data_index = (serial_data_index + 1) % 14;
+
     VBlankIntrWait();
 
-    updatePlayerSpriteEntry(0, &p);
-    updatePlayerSpriteEntry(1, &p2);
+    updatePlayerSpriteEntry(&p);
+
+    struct world_object* current = world_object_head;
+    i = 1;
+    while (current != NULL) {
+      updateWorldObjectSpriteEntry(i, current);
+
+      i++;
+      current = current->next;
+    }
+
     oam_copy(oam_mem, sprite, 128);
   }
 }
