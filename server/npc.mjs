@@ -30,7 +30,7 @@ export default class Npc extends WorldObject {
         x: v.x * config.speed, y: v.y * config.speed
       }
     });
-    this.wanderVector = wanderVectorOptions[0];
+    this.wanderVector = this.wanderVectorOptions[0];
   }
 
   tick() {
