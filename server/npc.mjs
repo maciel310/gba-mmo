@@ -1,6 +1,10 @@
 import {calculateDistance} from './utils.mjs';
+import WorldObject from './world_object.mjs';
 
-export default class Npc {
+const wanderVectorOptions =
+    [{x: 1, y: 0}, {x: -1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}];
+
+export default class Npc extends WorldObject {
   objectId = 0;
 
   position = {x: 0, y: 0};
@@ -10,13 +14,22 @@ export default class Npc {
   wanderVector = {x: 0, y: 0};
   wanderVectorOptions = [];
 
-  constructor(objectId, homePosition, wanderRadius, wanderVectorOptions) {
-    this.objectId = objectId;
+  constructor(config) {
+    super();
 
-    Object.assign(this.position, homePosition);
-    this.homePosition = homePosition;
-    this.wanderRadius = wanderRadius;
-    this.wanderVectorOptions = wanderVectorOptions;
+    this.objectId = config.objectId;
+    this.wanderRadius = config.wanderRadius;
+
+    const spawnPointIndex =
+        Math.floor(Math.random() * config.spawnPoints.length);
+    this.homePosition = config.spawnPoints[spawnPointIndex];
+    Object.assign(this.position, this.homePosition);
+
+    this.wanderVectorOptions = wanderVectorOptions.map(v => {
+      return {
+        x: v.x * config.speed, y: v.y * config.speed
+      }
+    });
     this.wanderVector = wanderVectorOptions[0];
   }
 

@@ -1,7 +1,7 @@
 import {createSocket} from 'dgram';
 import protobuf from 'protobufjs';
 
-import Npc from './npc.mjs';
+import WorldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
 
@@ -16,13 +16,7 @@ const ServerUpdate = root.lookupType('ServerUpdate');
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
 
-const npcs = [];
-
-const mayor = new Npc(
-    1, {x: 40, y: 40}, 10,
-    [{x: 1, y: 0}, {x: -1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}]);
-
-npcs.push(mayor);
+const worldObjectTracker = new WorldObjectTracker();
 
 server.on('error', (err) => {
   console.log('Error from UDP server', err);
@@ -45,12 +39,8 @@ server.on('message', (message, clientInfo) => {
 });
 
 setInterval(() => {
-  const worldObjects = [];
-
-  npcs.forEach((npc) => {
-    npc.tick();
-    worldObjects.push(npc.toWorldObject());
-  });
+  worldObjectTracker.tick();
+  const worldObjects = worldObjectTracker.getWorldObjects();
 
   // TODO: Limit update size to 512 bytes per UDP message.
   const update = ServerUpdate.encode({worldObject: worldObjects}).finish();
