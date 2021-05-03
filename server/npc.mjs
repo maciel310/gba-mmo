@@ -5,7 +5,7 @@ const wanderVectorOptions =
     [{x: 1, y: 0}, {x: -1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}];
 
 export default class Npc extends WorldObject {
-  objectId = 0;
+  spriteId = 0;
 
   position = {x: 0, y: 0};
   homePosition = {x: 0, y: 0};
@@ -17,7 +17,7 @@ export default class Npc extends WorldObject {
   constructor(config) {
     super();
 
-    this.objectId = config.objectId;
+    this.spriteId = config.spriteId;
     this.wanderRadius = config.wanderRadius;
 
     const spawnPointIndex =
@@ -63,6 +63,7 @@ export default class Npc extends WorldObject {
       objectId: this.objectId,
       x: this.position.x,
       y: this.position.y,
+      spriteId: this.spriteId
     };
   }
 }

@@ -1,4 +1,3 @@
-
 import Npc from './npc.mjs';
 import MayorConfig from './npcs/mayor.mjs';
 
@@ -18,15 +17,15 @@ export default class WorldObjectTracker {
 
   addObject(o) {
     this.objectMap.set(this.nextObjectId, o);
+    o.setObjectId(this.nextObjectId);
     this.nextObjectId++;
   }
 
   tick() {
     this.objectMap.forEach(v => v.tick());
-    console.log(this.objectMap.get(1).position);
   }
 
   getWorldObjects() {
-    [...this.objectMap.values()].map(v => v.toWorldObject());
+    return [...this.objectMap.values()].map(v => v.toWorldObject());
   }
 }
