@@ -1,3 +1,6 @@
+syntax = "proto2";
+
+import "world_object.proto";
 
 message ServerUpdate {
   repeated WorldObject world_object = 1;

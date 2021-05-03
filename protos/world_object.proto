@@ -1,3 +1,4 @@
+syntax = "proto2";
 
 message WorldObject {
   optional uint32 object_id = 1;
