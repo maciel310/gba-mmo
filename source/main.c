@@ -16,6 +16,7 @@ void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
 
   dma3_cpy(&tile_mem[4][0], characterTiles, characterTilesLen);
+  dma3_cpy(&tile_mem[4][8], character2Tiles, character2TilesLen);
 }
 
 typedef struct {
@@ -31,7 +32,7 @@ void updatePlayerSpriteEntry(Player *p) {
 }
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
-  obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
+  obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
   obj_set_pos(&sprite[i], o->x, o->y);
 }
 
@@ -58,21 +59,21 @@ int main() {
   p.x = 93;
   p.y = 55;
 
-  u32 serial_data[14][5] = {
-    {16, 0x0a060801, 0x10291828, 0x0a060802, 0x10651864},
-    {16, 0x0a060801, 0x102a1828, 0x0a060802, 0x10661864},
-    {16, 0x0a060801, 0x102a1829, 0x0a060802, 0x10671864},
-    {16, 0x0a060801, 0x102a182a, 0x0a060802, 0x10681864},
-    {16, 0x0a060801, 0x102a182b, 0x0a060802, 0x10691864},
-    {16, 0x0a060801, 0x102a182c, 0x0a060802, 0x106a1864},
-    {16, 0x0a060801, 0x102a182d, 0x0a060802, 0x106b1864},
-    {16, 0x0a060801, 0x102a182e, 0x0a060802, 0x106b1865},
-    {16, 0x0a060801, 0x102a182f, 0x0a060802, 0x106b1866},
-    {16, 0x0a060801, 0x102a1830, 0x0a060802, 0x106b1867},
-    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b1868},
-    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b1869},
-    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b186a},
-    {16, 0x0a060801, 0x102a1831, 0x0a060802, 0x106b186b},
+  u32 serial_data[14][6] = {
+    {20, 0x0a080801, 0x10291828, 0x20080a08, 0x08021029, 0x18282008},
+    {20, 0x0a080801, 0x102a1828, 0x20080a08, 0x0802102a, 0x18282008},
+    {20, 0x0a080801, 0x102b1828, 0x20080a08, 0x0802102b, 0x18282008},
+    {20, 0x0a080801, 0x102c1828, 0x20080a08, 0x0802102c, 0x18282008},
+    {20, 0x0a080801, 0x102d1828, 0x20080a08, 0x0802102d, 0x18282008},
+    {20, 0x0a080801, 0x102e1828, 0x20080a08, 0x0802102e, 0x18282008},
+    {20, 0x0a080801, 0x102d1828, 0x20080a08, 0x0802102f, 0x18282008},
+    {20, 0x0a080801, 0x102c1828, 0x20080a08, 0x08021030, 0x18282008},
+    {20, 0x0a080801, 0x102b1828, 0x20080a08, 0x08021031, 0x18282008},
+    {20, 0x0a080801, 0x102a1828, 0x20080a08, 0x08021031, 0x18282008},
+    {20, 0x0a080801, 0x10291828, 0x20080a08, 0x08021031, 0x18282008},
+    {20, 0x0a080801, 0x10281828, 0x20080a08, 0x08021031, 0x18282008},
+    {20, 0x0a080801, 0x10271828, 0x20080a08, 0x08021031, 0x18282008},
+    {20, 0x0a080801, 0x10261828, 0x20080a08, 0x08021031, 0x18282008},
   };
   u32 serial_data_index = 0;
 
@@ -104,7 +105,7 @@ int main() {
       REG_SIOCNT |= SION_ENABLE;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 6; i++) {
       REG_SIODATA32 = serial_data[serial_data_index][i];
       handle_serial();
     }

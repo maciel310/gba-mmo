@@ -17,6 +17,8 @@ typedef struct _WorldObject {
     uint32_t x; 
     bool has_y;
     uint32_t y; 
+    bool has_sprite_id;
+    uint32_t sprite_id; 
 } WorldObject;
 
 
@@ -25,19 +27,21 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define WorldObject_init_default                 {false, 0, false, 0, false, 0}
-#define WorldObject_init_zero                    {false, 0, false, 0, false, 0}
+#define WorldObject_init_default                 {false, 0, false, 0, false, 0, false, 0}
+#define WorldObject_init_zero                    {false, 0, false, 0, false, 0, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define WorldObject_object_id_tag                1
 #define WorldObject_x_tag                        2
 #define WorldObject_y_tag                        3
+#define WorldObject_sprite_id_tag                4
 
 /* Struct field encoding specification for nanopb */
 #define WorldObject_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, UINT32,   object_id,         1) \
 X(a, STATIC,   OPTIONAL, UINT32,   x,                 2) \
-X(a, STATIC,   OPTIONAL, UINT32,   y,                 3)
+X(a, STATIC,   OPTIONAL, UINT32,   y,                 3) \
+X(a, STATIC,   OPTIONAL, UINT32,   sprite_id,         4)
 #define WorldObject_CALLBACK NULL
 #define WorldObject_DEFAULT NULL
 
@@ -47,7 +51,7 @@ extern const pb_msgdesc_t WorldObject_msg;
 #define WorldObject_fields &WorldObject_msg
 
 /* Maximum encoded size of messages (where known) */
-#define WorldObject_size                         18
+#define WorldObject_size                         24
 
 #ifdef __cplusplus
 } /* extern "C" */

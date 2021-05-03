@@ -11,6 +11,7 @@ struct world_object* convert_world_object(WorldObject o) {
   new_object->object_id = o.object_id;
   new_object->x = o.x;
   new_object->y = o.y;
+  new_object->sprite_id = o.sprite_id;
   new_object->next = NULL;
 
   return new_object;
