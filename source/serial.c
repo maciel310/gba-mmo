@@ -18,6 +18,7 @@ size_t expected_message_length = 0;
 u8 buffer[128];
 void handle_serial() {
   u32 data = REG_SIODATA32;
+  REG_SIOCNT |= SION_ENABLE;
   if (expected_message_length == 0) {
     expected_message_length = data;
     message_length = 0;
