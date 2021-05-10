@@ -9,31 +9,33 @@
 #include "world_objects.h"
 #include "serial.h"
 
-OBJ_ATTR sprite[128];
+#define PLAYER_SCREEN_X 112
+#define PLAYER_SCREEN_Y 72
 
+OBJ_ATTR sprite[128];
+s32 worldX = 0;
+s32 worldY = 0;
 
 void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
-
   dma3_cpy(&tile_mem[4][0], characterTiles, characterTilesLen);
   dma3_cpy(&tile_mem[4][8], character2Tiles, character2TilesLen);
 }
 
 typedef struct {
-  u32 object_id;
-  u32 x;
-  u32 y;
+  s32 x;
+  s32 y;
 } Player;
 Player p;
 
-void updatePlayerSpriteEntry(Player *p) {
-  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
-  obj_set_pos(&sprite[0], p->x, p->y);
-}
-
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
-  obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
-  obj_set_pos(&sprite[i], o->x, o->y);
+  if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
+    obj_unhide(&sprite[i], ATTR0_MODE(0));
+    obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
+    obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
+  } else {
+    obj_hide(&sprite[i]);
+  }
 }
 
 int main() {
@@ -50,11 +52,14 @@ int main() {
   initializeSprites();
 
   REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
-  REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE0;
+  REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE3;
 
 	dma3_cpy(&tile_mem[1], mapTiles, mapTilesLen);
 	dma3_cpy(&se_mem[0], mapMap, mapMapLen);
 	dma3_cpy(pal_bg_mem, mapPal, mapPalLen);
+
+  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
+  obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 
   p.x = 93;
   p.y = 55;
@@ -65,19 +70,19 @@ int main() {
     key_poll();
 
     bool posChanged = false;
-    if (key_is_down(KEY_RIGHT) && p.x < SCREEN_WIDTH - 16) {
+    if (key_is_down(KEY_RIGHT)) {
       p.x++;
       posChanged = true;
     }
-    if (key_is_down(KEY_LEFT) && p.x > 0) {
+    if (key_is_down(KEY_LEFT)) {
       p.x--;
       posChanged = true;
     }
-    if (key_is_down(KEY_UP) && p.y > 0) {
+    if (key_is_down(KEY_UP)) {
       p.y--;
       posChanged = true;
     }
-    if (key_is_down(KEY_DOWN) && p.y < SCREEN_HEIGHT - 32) {
+    if (key_is_down(KEY_DOWN)) {
       p.y++;
       posChanged = true;
     }
@@ -89,7 +94,11 @@ int main() {
 
     VBlankIntrWait();
 
-    updatePlayerSpriteEntry(&p);
+    worldX = p.x - PLAYER_SCREEN_X;
+    worldY = p.y - PLAYER_SCREEN_Y;
+
+    REG_BG0HOFS = worldX;
+    REG_BG0VOFS = worldY;
 
     struct world_object* current = world_object_head;
     i = 1;

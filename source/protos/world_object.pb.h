@@ -14,9 +14,9 @@ typedef struct _WorldObject {
     bool has_object_id;
     uint32_t object_id; 
     bool has_x;
-    uint32_t x; 
+    int32_t x; 
     bool has_y;
-    uint32_t y; 
+    int32_t y; 
     bool has_sprite_id;
     uint32_t sprite_id; 
 } WorldObject;
@@ -39,8 +39,8 @@ extern "C" {
 /* Struct field encoding specification for nanopb */
 #define WorldObject_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, UINT32,   object_id,         1) \
-X(a, STATIC,   OPTIONAL, UINT32,   x,                 2) \
-X(a, STATIC,   OPTIONAL, UINT32,   y,                 3) \
+X(a, STATIC,   OPTIONAL, INT32,    x,                 2) \
+X(a, STATIC,   OPTIONAL, INT32,    y,                 3) \
 X(a, STATIC,   OPTIONAL, UINT32,   sprite_id,         4)
 #define WorldObject_CALLBACK NULL
 #define WorldObject_DEFAULT NULL
@@ -51,7 +51,7 @@ extern const pb_msgdesc_t WorldObject_msg;
 #define WorldObject_fields &WorldObject_msg
 
 /* Maximum encoded size of messages (where known) */
-#define WorldObject_size                         24
+#define WorldObject_size                         34
 
 #ifdef __cplusplus
 } /* extern "C" */
