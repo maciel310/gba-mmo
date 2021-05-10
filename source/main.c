@@ -9,6 +9,8 @@
 #include "world_objects.h"
 #include "serial.h"
 
+#include "outside.h"
+
 #define PLAYER_SCREEN_X 112
 #define PLAYER_SCREEN_Y 72
 
@@ -49,14 +51,16 @@ int main() {
 
   oam_init(sprite, 128);
 
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
+  REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE3 | BG_PRIO(1);
+  REG_BGCNT[1] = BG_CBB(1) | BG_SBB(4) | BG_8BPP | BG_SIZE3 | BG_PRIO(0);
+
+  dma3_cpy(&tile_mem[1], OverworldTiles, OverworldTilesLen);
+  dma3_cpy(&se_mem[0], Tile_Layer_1, OUTSIDE_LENGTH*sizeof(short));
+  dma3_cpy(&se_mem[4], Tile_Layer_2, OUTSIDE_LENGTH*sizeof(short));
+  dma3_cpy(pal_bg_mem, OverworldPal, OverworldPalLen);
+
   initializeSprites();
-
-  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
-  REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE3;
-
-	dma3_cpy(&tile_mem[1], mapTiles, mapTilesLen);
-	dma3_cpy(&se_mem[0], mapMap, mapMapLen);
-	dma3_cpy(pal_bg_mem, mapPal, mapPalLen);
 
   obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
@@ -99,6 +103,8 @@ int main() {
 
     REG_BG0HOFS = worldX;
     REG_BG0VOFS = worldY;
+    REG_BG1HOFS = worldX;
+    REG_BG1VOFS = worldY;
 
     struct world_object* current = world_object_head;
     i = 1;
