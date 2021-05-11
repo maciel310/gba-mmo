@@ -20,13 +20,23 @@ s32 worldY = 0;
 
 void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
-  dma3_cpy(&tile_mem[4][0], characterTiles, characterTilesLen);
-  dma3_cpy(&tile_mem[4][8], character2Tiles, character2TilesLen);
+  dma3_cpy(&tile_mem[4][0], character_downTiles, character_downTilesLen);
+  dma3_cpy(&tile_mem[4][8], character_upTiles, character_upTilesLen);
+  dma3_cpy(&tile_mem[4][16], character_rightTiles, character_rightTilesLen);
+  dma3_cpy(&tile_mem[4][24], character_leftTiles, character_leftTilesLen);
 }
+
+enum direction {
+  DOWN = 0,
+  UP = 8,
+  RIGHT = 16,
+  LEFT = 24
+};
 
 typedef struct {
   s32 x;
   s32 y;
+  enum direction d;
 } Player;
 Player p;
 
@@ -37,6 +47,29 @@ void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
     obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
   } else {
     obj_hide(&sprite[i]);
+  }
+}
+
+void update_player_sprite_entry() {
+  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(p.d));
+  obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
+}
+
+void update_player_direction(s32 h, s32 v) {
+  enum direction new_direction;
+  if (v > 0) {
+    new_direction = DOWN;
+  } else if (h > 0) {
+    new_direction = RIGHT;
+  } else if (h < 0) {
+    new_direction = LEFT;
+  } else {
+    new_direction = UP;
+  }
+
+  if (new_direction != p.d) {
+    p.d = new_direction;
+    update_player_sprite_entry();
   }
 }
 
@@ -67,6 +100,7 @@ int main() {
 
   p.x = 192;
   p.y = 152;
+  p.d = DOWN;
 
   u32 i;
   while (1) {
@@ -74,9 +108,11 @@ int main() {
     key_poll();
 
     s32 horizontalSpeed = key_tri_horz();
-    s32 verticalSpeed = key_tri_vert();
+    s32 verticalSpeed = horizontalSpeed == 0 ? key_tri_vert() : 0;
 
     if (horizontalSpeed != 0 || verticalSpeed != 0) {
+      update_player_direction(horizontalSpeed, verticalSpeed);
+
       s32 tileX = (p.x + horizontalSpeed) / 8 + 1;
       s32 tileXW = (p.x + horizontalSpeed + 8) / 8 + 1;
       s32 tileY = (p.y + verticalSpeed + 16) / 8;
