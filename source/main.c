@@ -65,33 +65,29 @@ int main() {
   obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 
-  p.x = 93;
-  p.y = 55;
+  p.x = 192;
+  p.y = 152;
 
   u32 i;
   while (1) {
 
     key_poll();
 
-    bool posChanged = false;
-    if (key_is_down(KEY_RIGHT)) {
-      p.x++;
-      posChanged = true;
-    }
-    if (key_is_down(KEY_LEFT)) {
-      p.x--;
-      posChanged = true;
-    }
-    if (key_is_down(KEY_UP)) {
-      p.y--;
-      posChanged = true;
-    }
-    if (key_is_down(KEY_DOWN)) {
-      p.y++;
-      posChanged = true;
-    }
+    s32 horizontalSpeed = key_tri_horz();
+    s32 verticalSpeed = key_tri_vert();
 
-    if (posChanged) {
+    if (horizontalSpeed != 0 || verticalSpeed != 0) {
+      s32 tileX = (p.x + horizontalSpeed) / 8 + 1;
+      s32 tileXW = (p.x + horizontalSpeed + 8) / 8 + 1;
+      s32 tileY = (p.y + verticalSpeed + 16) / 8;
+      s32 tileYH = (p.y + verticalSpeed + 16) / 8 + 1;
+      if ((collisionData[tileY] & (1ULL << (64 - tileX))) == 0
+          && (collisionData[tileY] & (1ULL << (64 - tileXW))) == 0
+          && (collisionData[tileYH] & (1ULL << (64 - tileX))) == 0
+          && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0) {
+        p.x += horizontalSpeed;
+        p.y += verticalSpeed;
+      }
       //REG_SIODATA32 = (p.x << 16) | p.y;
       //REG_SIOCNT |= SION_ENABLE;
     }
