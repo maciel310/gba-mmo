@@ -73,10 +73,16 @@ void update_player_direction(s32 h, s32 v) {
   }
 }
 
-int main() {
+void send_status() {
+  PlayerStatus player_status = PlayerStatus_init_default;
+  player_status.x = p.x;
+  player_status.y = p.y;
+  player_status.has_x = true;
+  player_status.has_y = true;
+  send_player_status(&player_status);
+}
 
-  REG_RCNT = 0;
-  REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
+int main() {
 
   irq_init(NULL);
   irq_enable(II_VBLANK);
@@ -124,8 +130,8 @@ int main() {
         p.x += horizontalSpeed;
         p.y += verticalSpeed;
       }
-      //REG_SIODATA32 = (p.x << 16) | p.y;
-      //REG_SIOCNT |= SION_ENABLE;
+
+      send_status();
     }
 
     VBlankIntrWait();

@@ -9,4 +9,7 @@
 PB_BIND(ServerUpdate, ServerUpdate, AUTO)
 
 
+PB_BIND(PlayerStatus, PlayerStatus, AUTO)
+
+
 
