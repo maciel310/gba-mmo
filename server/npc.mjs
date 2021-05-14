@@ -1,14 +1,15 @@
-import {calculateDistance} from './utils.mjs';
+import {calculateDistance, moveTowards} from './utils.mjs';
 import WorldObject from './world_object.mjs';
 
 const wanderVectorOptions =
-    [{x: 1, y: 0}, {x: -1, y: 0}, {x: 0, y: 1}, {x: 0, y: -1}];
+    [{x: 8, y: 0}, {x: -8, y: 0}, {x: 0, y: 8}, {x: 0, y: -8}];
 
 export default class Npc extends WorldObject {
   spriteId = 0;
 
   position = {x: 0, y: 0};
   homePosition = {x: 0, y: 0};
+  destinationPosition = {x: 0, y: 0};
 
   wanderRadius = 0;
   wanderVector = {x: 0, y: 0};
@@ -24,6 +25,7 @@ export default class Npc extends WorldObject {
         Math.floor(Math.random() * config.spawnPoints.length);
     this.homePosition = config.spawnPoints[spawnPointIndex];
     Object.assign(this.position, this.homePosition);
+    Object.assign(this.destinationPosition, this.homePosition);
 
     this.wanderVectorOptions = wanderVectorOptions.map(v => {
       return {
@@ -34,15 +36,24 @@ export default class Npc extends WorldObject {
   }
 
   tick() {
-    this.maybeChangeWanderVector();
+    if (this.position.x != this.destinationPosition.x ||
+        this.position.y != this.destinationPosition.y) {
+      this.position.x +=
+          moveTowards(this.position.x, this.destinationPosition.x);
+      this.position.y +=
+          moveTowards(this.position.y, this.destinationPosition.y);
+    } else {
+      this.maybeChangeWanderVector();
 
-    const newPosition = {
-      x: this.position.x + this.wanderVector.x,
-      y: this.position.y + this.wanderVector.y
-    };
-    if (calculateDistance(newPosition, this.homePosition) < this.wanderRadius) {
-      this.position.x += this.wanderVector.x;
-      this.position.y += this.wanderVector.y;
+      const newPosition = {
+        x: this.position.x + this.wanderVector.x,
+        y: this.position.y + this.wanderVector.y
+      };
+      if (calculateDistance(newPosition, this.homePosition) <
+          this.wanderRadius) {
+        this.destinationPosition.x = this.position.x + this.wanderVector.x;
+        this.destinationPosition.y = this.position.y + this.wanderVector.y;
+      }
     }
   }
 
