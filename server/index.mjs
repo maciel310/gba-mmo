@@ -1,6 +1,7 @@
 import {createSocket} from 'dgram';
 import protobuf from 'protobufjs';
 
+import Follower from './follower.mjs';
 import WorldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
@@ -13,6 +14,7 @@ const root = protobuf.loadSync([
 ]);
 const ServerUpdate = root.lookupType('ServerUpdate');
 const PlayerStatus = root.lookupType('PlayerStatus');
+const Direction = root.lookupEnum('Direction');
 
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
@@ -25,8 +27,10 @@ server.on('error', (err) => {
 
 const p1Pos = {
   x: 0,
-  y: 0
+  y: 0,
+  direction: Direction.UP,
 };
+worldObjectTracker.addObject(new Follower(p1Pos));
 
 server.on('message', (message, clientInfo) => {
   clientList.set(`${clientInfo.address}:${clientInfo.port}`, {
@@ -38,6 +42,7 @@ server.on('message', (message, clientInfo) => {
     const p = PlayerStatus.decode(message);
     p1Pos.x = p.x;
     p1Pos.y = p.y;
+    p1Pos.direction = p.direction;
   } catch (e) {
     console.log('Could not decode ', message.toString('hex'));
   }
@@ -46,9 +51,6 @@ server.on('message', (message, clientInfo) => {
 setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
-
-  worldObjects.push(
-      {objectId: 22, x: p1Pos.x - 10, y: p1Pos.y - 10, spriteId: 0});
 
   // TODO: Limit update size to 512 bytes per UDP message.
   const update = ServerUpdate.encode({worldObject: worldObjects}).finish();
