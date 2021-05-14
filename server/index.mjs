@@ -12,6 +12,7 @@ const root = protobuf.loadSync([
   '../gba-mmo-protos/network_messages.proto'
 ]);
 const ServerUpdate = root.lookupType('ServerUpdate');
+const PlayerStatus = root.lookupType('PlayerStatus');
 
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
@@ -33,14 +34,21 @@ server.on('message', (message, clientInfo) => {
     'port': clientInfo.port,
     'lastSeen': new Date()
   });
-  const [x, y] = message.toString().split(',');
-  p1Pos.x = x;
-  p1Pos.y = y;
+  try {
+    const p = PlayerStatus.decode(message);
+    p1Pos.x = p.x;
+    p1Pos.y = p.y;
+  } catch (e) {
+    console.log('Could not decode ', message.toString('hex'));
+  }
 });
 
 setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
+
+  worldObjects.push(
+      {objectId: 22, x: p1Pos.x - 10, y: p1Pos.y - 10, spriteId: 0});
 
   // TODO: Limit update size to 512 bytes per UDP message.
   const update = ServerUpdate.encode({worldObject: worldObjects}).finish();
