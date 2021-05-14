@@ -36,6 +36,8 @@ enum direction {
 typedef struct {
   s32 x;
   s32 y;
+  s32 destX;
+  s32 destY;
   enum direction d;
 } Player;
 Player p;
@@ -104,8 +106,8 @@ int main() {
   obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 
-  p.x = 192;
-  p.y = 152;
+  p.x = p.destX = 192;
+  p.y = p.destY = 152;
   p.d = DOWN;
 
   u32 i;
@@ -113,25 +115,38 @@ int main() {
 
     key_poll();
 
-    s32 horizontalSpeed = key_tri_horz();
-    s32 verticalSpeed = horizontalSpeed == 0 ? key_tri_vert() : 0;
-
-    if (horizontalSpeed != 0 || verticalSpeed != 0) {
-      update_player_direction(horizontalSpeed, verticalSpeed);
-
-      s32 tileX = (p.x + horizontalSpeed) / 8 + 1;
-      s32 tileXW = (p.x + horizontalSpeed + 8) / 8 + 1;
-      s32 tileY = (p.y + verticalSpeed + 16) / 8;
-      s32 tileYH = (p.y + verticalSpeed + 16) / 8 + 1;
-      if ((collisionData[tileY] & (1ULL << (64 - tileX))) == 0
-          && (collisionData[tileY] & (1ULL << (64 - tileXW))) == 0
-          && (collisionData[tileYH] & (1ULL << (64 - tileX))) == 0
-          && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0) {
-        p.x += horizontalSpeed;
-        p.y += verticalSpeed;
+    if (p.destX != p.x || p.destY != p.y) {
+      if (p.destX > p.x) {
+        p.x++;
+      } else if (p.destX < p.x) {
+        p.x--;
       }
+      if (p.destY > p.y) {
+        p.y++;
+      } else if (p.destY < p.y) {
+        p.y--;
+      }
+    } else {
+      s32 horizontalSpeed = key_tri_horz() * 8;
+      s32 verticalSpeed = horizontalSpeed == 0 ? key_tri_vert() * 8 : 0;
 
-      send_status();
+      if (horizontalSpeed != 0 || verticalSpeed != 0) {
+        update_player_direction(horizontalSpeed, verticalSpeed);
+
+        s32 tileX = (p.x + horizontalSpeed) / 8 + 1;
+        s32 tileXW = (p.x + horizontalSpeed + 8) / 8 + 1;
+        s32 tileY = (p.y + verticalSpeed + 16) / 8;
+        s32 tileYH = (p.y + verticalSpeed + 16) / 8 + 1;
+        if ((collisionData[tileY] & (1ULL << (64 - tileX))) == 0
+            && (collisionData[tileY] & (1ULL << (64 - tileXW))) == 0
+            && (collisionData[tileYH] & (1ULL << (64 - tileX))) == 0
+            && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0) {
+          p.destX += horizontalSpeed;
+          p.destY += verticalSpeed;
+        }
+
+        send_status();
+      }
     }
 
     VBlankIntrWait();
