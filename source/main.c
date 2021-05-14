@@ -85,7 +85,9 @@ void send_status() {
 }
 
 s32 move_towards(s32 current, s32 dest) {
-  if (current > dest) {
+  if (abs(dest - current) > 16) {
+    return dest - current;
+  } else if (current > dest) {
     return -1;
   } else if (current < dest) {
     return 1;
