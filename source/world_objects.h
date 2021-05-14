@@ -10,6 +10,8 @@ struct world_object {
   u32 object_id;
   s32 x;
   s32 y;
+  s32 dest_x;
+  s32 dest_y;
   u32 sprite_id;
 
   struct world_object* next;

@@ -11,6 +11,8 @@ struct world_object* convert_world_object(WorldObject o) {
   new_object->object_id = o.object_id;
   new_object->x = o.x;
   new_object->y = o.y;
+  new_object->dest_x = o.x;
+  new_object->dest_y = o.y;
   new_object->sprite_id = o.sprite_id;
   new_object->next = NULL;
 
@@ -27,8 +29,8 @@ void update_world_object(WorldObject o) {
   struct world_object* previous = NULL;
   while (current != NULL) {
     if (current->object_id == o.object_id) {
-      current->x = o.x;
-      current->y = o.y;
+      current->dest_x = o.x;
+      current->dest_y = o.y;
       return;
     } else if (current->object_id > o.object_id) {
       struct world_object* new_object = convert_world_object(o);

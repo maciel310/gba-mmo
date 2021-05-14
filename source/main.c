@@ -36,8 +36,8 @@ enum direction {
 typedef struct {
   s32 x;
   s32 y;
-  s32 destX;
-  s32 destY;
+  s32 dest_x;
+  s32 dest_y;
   enum direction d;
 } Player;
 Player p;
@@ -84,6 +84,16 @@ void send_status() {
   send_player_status(&player_status);
 }
 
+s32 move_towards(s32 current, s32 dest) {
+  if (current > dest) {
+    return -1;
+  } else if (current < dest) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 int main() {
 
   irq_init(NULL);
@@ -106,8 +116,8 @@ int main() {
   obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 
-  p.x = p.destX = 192;
-  p.y = p.destY = 152;
+  p.x = p.dest_x = 192;
+  p.y = p.dest_y = 152;
   p.d = DOWN;
 
   u32 i;
@@ -115,17 +125,9 @@ int main() {
 
     key_poll();
 
-    if (p.destX != p.x || p.destY != p.y) {
-      if (p.destX > p.x) {
-        p.x++;
-      } else if (p.destX < p.x) {
-        p.x--;
-      }
-      if (p.destY > p.y) {
-        p.y++;
-      } else if (p.destY < p.y) {
-        p.y--;
-      }
+    if (p.dest_x != p.x || p.dest_y != p.y) {
+      p.x += move_towards(p.x, p.dest_x);
+      p.y += move_towards(p.y, p.dest_y);
     } else {
       s32 horizontalSpeed = key_tri_horz() * 8;
       s32 verticalSpeed = horizontalSpeed == 0 ? key_tri_vert() * 8 : 0;
@@ -141,8 +143,8 @@ int main() {
             && (collisionData[tileY] & (1ULL << (64 - tileXW))) == 0
             && (collisionData[tileYH] & (1ULL << (64 - tileX))) == 0
             && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0) {
-          p.destX += horizontalSpeed;
-          p.destY += verticalSpeed;
+          p.dest_x += horizontalSpeed;
+          p.dest_y += verticalSpeed;
         }
 
         send_status();
@@ -162,6 +164,9 @@ int main() {
     struct world_object* current = world_object_head;
     i = 1;
     while (current != NULL) {
+      current->x += move_towards(current->x, current->dest_x);
+      current->y += move_towards(current->y, current->dest_y);
+
       updateWorldObjectSpriteEntry(i, current);
 
       i++;
