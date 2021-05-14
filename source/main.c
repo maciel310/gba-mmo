@@ -20,25 +20,18 @@ s32 worldY = 0;
 
 void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
-  dma3_cpy(&tile_mem[4][0], character_downTiles, character_downTilesLen);
-  dma3_cpy(&tile_mem[4][8], character_upTiles, character_upTilesLen);
-  dma3_cpy(&tile_mem[4][16], character_rightTiles, character_rightTilesLen);
-  dma3_cpy(&tile_mem[4][24], character_leftTiles, character_leftTilesLen);
+  dma3_cpy(&tile_mem[4][0], character_upTiles, character_downTilesLen);
+  dma3_cpy(&tile_mem[4][8], character_downTiles, character_upTilesLen);
+  dma3_cpy(&tile_mem[4][16], character_leftTiles, character_rightTilesLen);
+  dma3_cpy(&tile_mem[4][24], character_rightTiles, character_leftTilesLen);
 }
-
-enum direction {
-  DOWN = 0,
-  UP = 8,
-  RIGHT = 16,
-  LEFT = 24
-};
 
 typedef struct {
   s32 x;
   s32 y;
   s32 dest_x;
   s32 dest_y;
-  enum direction d;
+  Direction d;
 } Player;
 Player p;
 
@@ -53,20 +46,35 @@ void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
 }
 
 void update_player_sprite_entry() {
-  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(p.d));
+  int sprite_id;
+  switch (p.d) {
+    case Direction_UP:
+      sprite_id = 0;
+      break;
+    case Direction_DOWN:
+      sprite_id = 8;
+      break;
+    case Direction_LEFT:
+      sprite_id = 16;
+      break;
+    default:
+      sprite_id = 24;
+      break;
+  }
+  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(sprite_id));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 }
 
 void update_player_direction(s32 h, s32 v) {
-  enum direction new_direction;
+  Direction new_direction;
   if (v > 0) {
-    new_direction = DOWN;
+    new_direction = Direction_DOWN;
   } else if (h > 0) {
-    new_direction = RIGHT;
+    new_direction = Direction_RIGHT;
   } else if (h < 0) {
-    new_direction = LEFT;
+    new_direction = Direction_LEFT;
   } else {
-    new_direction = UP;
+    new_direction = Direction_UP;
   }
 
   if (new_direction != p.d) {
@@ -79,13 +87,15 @@ void send_status() {
   PlayerStatus player_status = PlayerStatus_init_default;
   player_status.x = p.x;
   player_status.y = p.y;
+  player_status.direction = p.d;
   player_status.has_x = true;
   player_status.has_y = true;
+  player_status.has_direction = true;
   send_player_status(&player_status);
 }
 
 s32 move_towards(s32 current, s32 dest) {
-  if (abs(dest - current) > 16) {
+  if (abs(dest - current) > 32) {
     return dest - current;
   } else if (current > dest) {
     return -1;
@@ -120,7 +130,8 @@ int main() {
 
   p.x = p.dest_x = 192;
   p.y = p.dest_y = 152;
-  p.d = DOWN;
+  p.d = Direction_DOWN;
+  update_player_sprite_entry();
 
   u32 i;
   while (1) {

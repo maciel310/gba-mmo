@@ -31,6 +31,7 @@ void update_world_object(WorldObject o) {
     if (current->object_id == o.object_id) {
       current->dest_x = o.x;
       current->dest_y = o.y;
+      current->sprite_id = o.sprite_id;
       return;
     } else if (current->object_id > o.object_id) {
       struct world_object* new_object = convert_world_object(o);
