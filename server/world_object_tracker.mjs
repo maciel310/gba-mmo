@@ -13,12 +13,21 @@ export default class WorldObjectTracker {
 
   spawnPermanentNpcs() {
     this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig));
   }
 
   addObject(o) {
     this.objectMap.set(this.nextObjectId, o);
     o.setObjectId(this.nextObjectId);
     this.nextObjectId++;
+  }
+
+  getObject(id) {
+    return this.objectMap.get(id);
   }
 
   tick() {

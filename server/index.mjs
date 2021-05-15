@@ -43,6 +43,11 @@ server.on('message', (message, clientInfo) => {
     p1Pos.x = p.x;
     p1Pos.y = p.y;
     p1Pos.direction = p.direction;
+
+    if (p.interactionObjectId) {
+      const o = worldObjectTracker.getObject(p.interactionObjectId);
+      o.spriteId = (o.spriteId + 8) % 24;
+    }
   } catch (e) {
     console.log('Could not decode ', message.toString('hex'));
   }
