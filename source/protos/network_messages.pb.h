@@ -31,6 +31,8 @@ typedef struct _PlayerStatus {
     int32_t y; 
     bool has_direction;
     Direction direction; 
+    bool has_interaction_object_id;
+    int32_t interaction_object_id; 
 } PlayerStatus;
 
 
@@ -46,15 +48,16 @@ extern "C" {
 
 /* Initializer values for message structs */
 #define ServerUpdate_init_default                {{{NULL}, NULL}}
-#define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN}
+#define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define ServerUpdate_init_zero                   {{{NULL}, NULL}}
-#define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN}
+#define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define ServerUpdate_world_object_tag            1
 #define PlayerStatus_x_tag                       1
 #define PlayerStatus_y_tag                       2
 #define PlayerStatus_direction_tag               3
+#define PlayerStatus_interaction_object_id_tag   4
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -66,7 +69,8 @@ X(a, CALLBACK, REPEATED, MESSAGE,  world_object,      1)
 #define PlayerStatus_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, INT32,    x,                 1) \
 X(a, STATIC,   OPTIONAL, INT32,    y,                 2) \
-X(a, STATIC,   OPTIONAL, UENUM,    direction,         3)
+X(a, STATIC,   OPTIONAL, UENUM,    direction,         3) \
+X(a, STATIC,   OPTIONAL, INT32,    interaction_object_id,   4)
 #define PlayerStatus_CALLBACK NULL
 #define PlayerStatus_DEFAULT NULL
 
@@ -79,7 +83,7 @@ extern const pb_msgdesc_t PlayerStatus_msg;
 
 /* Maximum encoded size of messages (where known) */
 /* ServerUpdate_size depends on runtime parameters */
-#define PlayerStatus_size                        24
+#define PlayerStatus_size                        35
 
 #ifdef __cplusplus
 } /* extern "C" */

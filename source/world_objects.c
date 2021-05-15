@@ -51,3 +51,43 @@ void update_world_object(WorldObject o) {
   previous->next = convert_world_object(o);
 }
 
+// Returns the world_object next to the given position, or 0 if none found.
+u32 find_next_to(s32 x, s32 y, Direction direction) {
+  s32 object_x_min;
+  s32 object_x_max;
+  s32 object_y_min;
+  s32 object_y_max;
+  if (direction == Direction_UP) {
+    object_x_min = x - 8;
+    object_x_max = x + 16;
+    object_y_min = y - 8;
+    object_y_max = y;
+  } else if (direction == Direction_DOWN) {
+    object_x_min = x - 8;
+    object_x_max = x + 16;
+    object_y_min = y + 16;
+    object_y_max = y + 24;
+  } else if (direction == Direction_LEFT) {
+    object_x_min = x - 16;
+    object_x_max = x - 8;
+    object_y_min = y - 8;
+    object_y_max = y + 8;
+  } else {
+    object_x_min = x + 8;
+    object_x_max = x + 16;
+    object_y_min = y - 8;
+    object_y_max = y + 8;
+  }
+
+  struct world_object* current = world_object_head;
+  while (current != NULL) {
+    if (current->is_on_screen
+        && current->x >= object_x_min && current->x <= object_x_max
+        && current->y >= object_y_min && current->y <= object_y_max) {
+      return current->object_id;
+    }
+
+    current = current->next;
+  }
+  return 0;
+}

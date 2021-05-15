@@ -35,13 +35,17 @@ typedef struct {
 } Player;
 Player p;
 
+u32 interaction_world_object_id = 0;
+
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
     obj_unhide(&sprite[i], ATTR0_MODE(0));
     obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
     obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
+    o->is_on_screen = true;
   } else {
     obj_hide(&sprite[i]);
+    o->is_on_screen = false;
   }
 }
 
@@ -91,6 +95,13 @@ void send_status() {
   player_status.has_x = true;
   player_status.has_y = true;
   player_status.has_direction = true;
+
+  if (interaction_world_object_id != 0) {
+    player_status.interaction_object_id = interaction_world_object_id;
+    player_status.has_interaction_object_id = true;
+    interaction_world_object_id = 0;
+  }
+
   send_player_status(&player_status);
 }
 
@@ -133,8 +144,10 @@ int main() {
   p.d = Direction_DOWN;
   update_player_sprite_entry();
 
+  bool should_send_status;
   u32 i;
   while (1) {
+    should_send_status = false;
 
     key_poll();
 
@@ -160,19 +173,9 @@ int main() {
           p.dest_y += verticalSpeed;
         }
 
-        send_status();
+        should_send_status = true;
       }
     }
-
-    VBlankIntrWait();
-
-    worldX = p.x - PLAYER_SCREEN_X;
-    worldY = p.y - PLAYER_SCREEN_Y;
-
-    REG_BG0HOFS = worldX;
-    REG_BG0VOFS = worldY;
-    REG_BG1HOFS = worldX;
-    REG_BG1VOFS = worldY;
 
     struct world_object* current = world_object_head;
     i = 1;
@@ -185,6 +188,26 @@ int main() {
       i++;
       current = current->next;
     }
+
+    // Interact with WorldObject
+    if (key_hit(KEY_A)) {
+      interaction_world_object_id = find_next_to(p.x, p.y, p.d);
+      should_send_status = true;
+    }
+
+    if (should_send_status) {
+      send_status();
+    }
+
+    VBlankIntrWait();
+
+    worldX = p.x - PLAYER_SCREEN_X;
+    worldY = p.y - PLAYER_SCREEN_Y;
+
+    REG_BG0HOFS = worldX;
+    REG_BG0VOFS = worldY;
+    REG_BG1HOFS = worldX;
+    REG_BG1VOFS = worldY;
 
     oam_copy(oam_mem, sprite, 128);
   }
