@@ -1,9 +1,12 @@
 syntax = "proto2";
 
+import "nanopb.proto";
 import "world_object.proto";
 
 message ServerUpdate {
   repeated WorldObject world_object = 1;
+
+  optional string network_message = 2 [(nanopb).max_size = 90];
 }
 
 enum Direction {
