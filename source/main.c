@@ -8,6 +8,7 @@
 
 #include "world_objects.h"
 #include "serial.h"
+#include "text.h"
 
 #include "outside.h"
 
@@ -117,16 +118,23 @@ s32 move_towards(s32 current, s32 dest) {
   }
 }
 
+bool message_displayed = false;
+void show_network_message(CSTR message) {
+  text_display(message);
+  message_displayed = true;
+}
+
 int main() {
-
-  irq_init(NULL);
-  irq_enable(II_VBLANK);
-  serial_init();
-
-  oam_init(sprite, 128);
 
   REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
   REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE3 | BG_PRIO(1);
+
+  irq_init(NULL);
+  irq_enable(II_VBLANK);
+
+  oam_init(sprite, 128);
+  serial_init(show_network_message);
+  text_init();
 
   dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
   dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
@@ -189,8 +197,13 @@ int main() {
 
     // Interact with WorldObject
     if (key_hit(KEY_A)) {
-      interaction_world_object_id = find_next_to(p.x, p.y, p.d);
-      should_send_status = true;
+      if (message_displayed) {
+        text_close();
+        message_displayed = false;
+      } else {
+        interaction_world_object_id = find_next_to(p.x, p.y, p.d);
+        should_send_status = true;
+      }
     }
 
     if (should_send_status) {

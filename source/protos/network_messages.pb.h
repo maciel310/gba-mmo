@@ -20,10 +20,6 @@ typedef enum _Direction {
 } Direction;
 
 /* Struct definitions */
-typedef struct _ServerUpdate { 
-    pb_callback_t world_object; 
-} ServerUpdate;
-
 typedef struct _PlayerStatus { 
     bool has_x;
     int32_t x; 
@@ -34,6 +30,12 @@ typedef struct _PlayerStatus {
     bool has_interaction_object_id;
     int32_t interaction_object_id; 
 } PlayerStatus;
+
+typedef struct _ServerUpdate { 
+    pb_callback_t world_object; 
+    bool has_network_message;
+    char network_message[90]; 
+} ServerUpdate;
 
 
 /* Helper constants for enums */
@@ -47,21 +49,23 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, ""}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, ""}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define ServerUpdate_world_object_tag            1
 #define PlayerStatus_x_tag                       1
 #define PlayerStatus_y_tag                       2
 #define PlayerStatus_direction_tag               3
 #define PlayerStatus_interaction_object_id_tag   4
+#define ServerUpdate_world_object_tag            1
+#define ServerUpdate_network_message_tag         2
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
-X(a, CALLBACK, REPEATED, MESSAGE,  world_object,      1)
+X(a, CALLBACK, REPEATED, MESSAGE,  world_object,      1) \
+X(a, STATIC,   OPTIONAL, STRING,   network_message,   2)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject

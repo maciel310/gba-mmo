@@ -1,10 +1,14 @@
 #include "serial.h"
 #include "world_objects.h"
 
-void serial_init() {
+void (*handle_network_message)(CSTR);
+
+void serial_init(void (*message_callback)(CSTR)) {
   REG_RCNT = 0;
   REG_SIODATA32 = 0;
   REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
+
+  handle_network_message = message_callback;
 
   irq_add(II_SERIAL, handle_serial);
 }
@@ -54,6 +58,10 @@ void handle_serial() {
     pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length);
     message.world_object.funcs.decode = decode_world_object;
     pb_decode(&stream, ServerUpdate_fields, &message);
+
+    if (message.has_network_message) {
+      handle_network_message(message.network_message);
+    }
 
     expected_message_length = 0;
     message_length = 0;
