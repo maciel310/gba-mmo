@@ -19,4 +19,5 @@ message PlayerStatus {
   optional int32 x = 1;
   optional int32 y = 2;
   optional Direction direction = 3;
+  optional int32 interaction_object_id = 4;
 }
