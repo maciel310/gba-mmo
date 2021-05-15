@@ -32,6 +32,7 @@ const p1Pos = {
 };
 worldObjectTracker.addObject(new Follower(p1Pos));
 
+let serverMessage = '';
 server.on('message', (message, clientInfo) => {
   clientList.set(`${clientInfo.address}:${clientInfo.port}`, {
     'address': clientInfo.address,
@@ -46,7 +47,7 @@ server.on('message', (message, clientInfo) => {
 
     if (p.interactionObjectId) {
       const o = worldObjectTracker.getObject(p.interactionObjectId);
-      o.spriteId = (o.spriteId + 8) % 24;
+      serverMessage = o.interact();
     }
   } catch (e) {
     console.log('Could not decode ', message.toString('hex'));
@@ -57,8 +58,13 @@ setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
 
+  const updateObject = {worldObject: worldObjects};
+  if (serverMessage != '') {
+    updateObject.networkMessage = serverMessage;
+    serverMessage = '';
+  }
   // TODO: Limit update size to 512 bytes per UDP message.
-  const update = ServerUpdate.encode({worldObject: worldObjects}).finish();
+  const update = ServerUpdate.encode(updateObject).finish();
 
   for (const clientInfo of clientList.values()) {
     server.send(update, clientInfo.port, clientInfo.address);
