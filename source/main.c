@@ -125,14 +125,12 @@ int main() {
 
   oam_init(sprite, 128);
 
-  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
   REG_BGCNT[0] = BG_CBB(1) | BG_SBB(0) | BG_8BPP | BG_SIZE3 | BG_PRIO(1);
-  REG_BGCNT[1] = BG_CBB(1) | BG_SBB(4) | BG_8BPP | BG_SIZE3 | BG_PRIO(0);
 
-  dma3_cpy(&tile_mem[1], OverworldTiles, OverworldTilesLen);
-  dma3_cpy(&se_mem[0], Tile_Layer_1, OUTSIDE_LENGTH*sizeof(short));
-  dma3_cpy(&se_mem[4], Tile_Layer_2, OUTSIDE_LENGTH*sizeof(short));
-  dma3_cpy(pal_bg_mem, OverworldPal, OverworldPalLen);
+  dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
+  dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
+  dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
 
   initializeSprites();
 
@@ -206,8 +204,6 @@ int main() {
 
     REG_BG0HOFS = worldX;
     REG_BG0VOFS = worldY;
-    REG_BG1HOFS = worldX;
-    REG_BG1VOFS = worldY;
 
     oam_copy(oam_mem, sprite, 128);
   }
