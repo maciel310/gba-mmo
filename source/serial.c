@@ -63,7 +63,7 @@ void handle_serial() {
 void send_player_status(PlayerStatus* p) {
   if (outgoing_position >= outgoing_length) {
     pb_ostream_t stream = pb_ostream_from_buffer(outgoing_buffer+4, sizeof(outgoing_buffer)-4);
-    bool status = pb_encode(&stream, PlayerStatus_fields, p);
+    pb_encode(&stream, PlayerStatus_fields, p);
     outgoing_buffer[0] = 0;
     outgoing_buffer[1] = 0;
     outgoing_buffer[2] = 0;
