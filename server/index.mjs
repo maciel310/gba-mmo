@@ -1,20 +1,12 @@
 import {createSocket} from 'dgram';
-import protobuf from 'protobufjs';
 
 import Follower from './follower.mjs';
+import {Direction, PlayerStatus, ServerUpdate} from './proto.mjs';
 import WorldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
 
 const TICK_INTERVAL_MS = 1000 / 10;
-
-const root = protobuf.loadSync([
-  '../gba-mmo-protos/world_object.proto',
-  '../gba-mmo-protos/network_messages.proto'
-]);
-const ServerUpdate = root.lookupType('ServerUpdate');
-const PlayerStatus = root.lookupType('PlayerStatus');
-const Direction = root.lookupEnum('Direction');
 
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
