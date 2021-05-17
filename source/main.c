@@ -22,9 +22,9 @@ s32 worldY = 0;
 void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
   dma3_cpy(&tile_mem[4][0], character_upTiles, character_downTilesLen);
-  dma3_cpy(&tile_mem[4][8], character_downTiles, character_upTilesLen);
-  dma3_cpy(&tile_mem[4][16], character_leftTiles, character_rightTilesLen);
-  dma3_cpy(&tile_mem[4][24], character_rightTiles, character_leftTilesLen);
+  dma3_cpy(&tile_mem[4][16], character_downTiles, character_upTilesLen);
+  dma3_cpy(&tile_mem[4][32], character_leftTiles, character_rightTilesLen);
+  dma3_cpy(&tile_mem[4][48], character_rightTiles, character_leftTilesLen);
 }
 
 typedef struct {
@@ -41,7 +41,7 @@ u32 interaction_world_object_id = 0;
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
     obj_unhide(&sprite[i], ATTR0_MODE(0));
-    obj_set_attr(&sprite[i], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
+    obj_set_attr(&sprite[i], ATTR0_8BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
     obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
     o->is_on_screen = true;
   } else {
@@ -57,16 +57,16 @@ void update_player_sprite_entry() {
       sprite_id = 0;
       break;
     case Direction_DOWN:
-      sprite_id = 8;
-      break;
-    case Direction_LEFT:
       sprite_id = 16;
       break;
+    case Direction_LEFT:
+      sprite_id = 32;
+      break;
     default:
-      sprite_id = 24;
+      sprite_id = 48;
       break;
   }
-  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(sprite_id));
+  obj_set_attr(&sprite[0], ATTR0_8BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(sprite_id));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 }
 
@@ -141,9 +141,6 @@ int main() {
   dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
 
   initializeSprites();
-
-  obj_set_attr(&sprite[0], ATTR0_4BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(0));
-  obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
 
   p.x = p.dest_x = 192;
   p.y = p.dest_y = 152;
