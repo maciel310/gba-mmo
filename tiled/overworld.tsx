@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.5" tiledversion="1.6.0" name="overworld" tilewidth="8" tileheight="8" tilecount="936" columns="36">
- <image source="../gfx/map/Overworld.png" width="288" height="208"/>
+ <image source="Overworld.png" width="288" height="208"/>
  <tile id="12">
   <properties>
    <property name="isSolid" type="bool" value="false"/>
@@ -1111,6 +1111,16 @@
    <property name="isSolid" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="387">
+  <properties>
+   <property name="isSolid" type="bool" value="false"/>
+  </properties>
+ </tile>
+ <tile id="388">
+  <properties>
+   <property name="isSolid" type="bool" value="false"/>
+  </properties>
+ </tile>
  <tile id="402">
   <properties>
    <property name="isSolid" type="bool" value="true"/>
@@ -1137,6 +1147,46 @@
   </properties>
  </tile>
  <tile id="407">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="422">
+  <properties>
+   <property name="isSolid" type="bool" value="false"/>
+  </properties>
+ </tile>
+ <tile id="423">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="424">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="425">
+  <properties>
+   <property name="isSolid" type="bool" value="false"/>
+  </properties>
+ </tile>
+ <tile id="458">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="459">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="460">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="461">
   <properties>
    <property name="isSolid" type="bool" value="true"/>
   </properties>
@@ -1266,6 +1316,16 @@
    <property name="isSolid" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="531">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="532">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="533">
   <properties>
    <property name="isSolid" type="bool" value="true"/>
@@ -1312,6 +1372,16 @@
   </properties>
  </tile>
  <tile id="566">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="567">
+  <properties>
+   <property name="isSolid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="568">
   <properties>
    <property name="isSolid" type="bool" value="true"/>
   </properties>
