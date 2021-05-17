@@ -15,18 +15,18 @@ export default class Follower extends WorldObject {
   tick() {
     if (this.playerPosition.direction == 1) {
       this.position.x = this.playerPosition.x;
-      this.position.y = this.playerPosition.y + 8;
+      this.position.y = this.playerPosition.y + 16;
       this.spriteId = 0;
     } else if (this.playerPosition.direction == 2) {
       this.position.x = this.playerPosition.x;
-      this.position.y = this.playerPosition.y - 8;
+      this.position.y = this.playerPosition.y - 16;
       this.spriteId = 8;
     } else if (this.playerPosition.direction == 3) {
-      this.position.x = this.playerPosition.x + 8;
+      this.position.x = this.playerPosition.x + 16;
       this.position.y = this.playerPosition.y;
       this.spriteId = 16;
     } else if (this.playerPosition.direction == 4) {
-      this.position.x = this.playerPosition.x - 8;
+      this.position.x = this.playerPosition.x - 16;
       this.position.y = this.playerPosition.y;
       this.spriteId = 24;
     }
