@@ -27,7 +27,7 @@ u8 outgoing_buffer[30];
 
 size_t message_length = 0;
 size_t expected_message_length = 0;
-u8 buffer[128];
+u8 buffer[256];
 void handle_serial() {
   u32 data = REG_SIODATA32;
 
