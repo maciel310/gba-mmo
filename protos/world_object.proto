@@ -6,4 +6,22 @@ message WorldObject {
   optional int32 y = 3;
 
   optional uint32 sprite_id = 4;
+  optional SpriteSize sprite_size = 5;
+}
+
+enum SpriteSize {
+  SQUARE_8x8 = 0;
+  SQUARE_16x16 = 1;
+  SQUARE_32x32 = 2;
+  SQUARE_64x64 = 3;
+
+  WIDE_16x8 = 4;
+  WIDE_32x8 = 5;
+  WIDE_32x16 = 6;
+  WIDE_64x32 = 7;
+
+  TALL_8x16 = 8;
+  TALL_8x32 = 9;
+  TALL_16x32 = 10;
+  TALL_32x64 = 11;
 }
