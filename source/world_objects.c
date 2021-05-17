@@ -60,12 +60,12 @@ u32 find_next_to(s32 x, s32 y, Direction direction) {
   if (direction == Direction_UP) {
     object_x_min = x - 8;
     object_x_max = x + 16;
-    object_y_min = y - 8;
-    object_y_max = y;
+    object_y_min = y - 16;
+    object_y_max = y + 8;
   } else if (direction == Direction_DOWN) {
     object_x_min = x - 8;
     object_x_max = x + 16;
-    object_y_min = y + 16;
+    object_y_min = y + 8;
     object_y_max = y + 24;
   } else if (direction == Direction_LEFT) {
     object_x_min = x - 16;
