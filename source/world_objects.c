@@ -14,6 +14,7 @@ struct world_object* convert_world_object(WorldObject o) {
   new_object->dest_x = o.x;
   new_object->dest_y = o.y;
   new_object->sprite_id = o.sprite_id;
+  new_object->sprite_size = o.sprite_size;
   new_object->next = NULL;
 
   return new_object;
@@ -91,3 +92,26 @@ u32 find_next_to(s32 x, s32 y, Direction direction) {
   }
   return 0;
 }
+
+const u32 sprite_type_lut[12] = {
+  ATTR0_SQUARE, ATTR0_SQUARE, ATTR0_SQUARE, ATTR0_SQUARE,
+  ATTR0_WIDE, ATTR0_WIDE, ATTR0_WIDE, ATTR0_WIDE,
+  ATTR0_TALL, ATTR0_TALL, ATTR0_TALL, ATTR0_TALL
+};
+
+const u32 sprite_size_lut[12] = {
+  ATTR1_SIZE_8x8,
+  ATTR1_SIZE_16x16,
+  ATTR1_SIZE_32x32,
+  ATTR1_SIZE_64x64,
+
+  ATTR1_SIZE_16x8,
+  ATTR1_SIZE_32x8,
+  ATTR1_SIZE_32x16,
+  ATTR1_SIZE_64x32,
+
+  ATTR1_SIZE_8x16,
+  ATTR1_SIZE_8x32,
+  ATTR1_SIZE_16x32,
+  ATTR1_SIZE_32x64,
+};

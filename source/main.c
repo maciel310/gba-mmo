@@ -25,6 +25,9 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][16], character_downTiles, character_upTilesLen);
   dma3_cpy(&tile_mem[4][32], character_leftTiles, character_rightTilesLen);
   dma3_cpy(&tile_mem[4][48], character_rightTiles, character_leftTilesLen);
+  dma3_cpy(&tile_mem[4][64], tree1Tiles, tree1TilesLen);
+  dma3_cpy(&tile_mem[4][96], tree2Tiles, tree2TilesLen);
+  dma3_cpy(&tile_mem[4][128], tree3Tiles, tree3TilesLen);
 }
 
 typedef struct {
@@ -41,7 +44,10 @@ u32 interaction_world_object_id = 0;
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
     obj_unhide(&sprite[i], ATTR0_MODE(0));
-    obj_set_attr(&sprite[i], ATTR0_8BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
+    obj_set_attr(
+      &sprite[i],
+      ATTR0_8BPP | sprite_type_lut[o->sprite_size] | ATTR0_REG,
+      sprite_size_lut[o->sprite_size], ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
     obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
     o->is_on_screen = true;
   } else {

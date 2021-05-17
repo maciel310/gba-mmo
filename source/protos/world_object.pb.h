@@ -9,6 +9,22 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
+/* Enum definitions */
+typedef enum _SpriteSize { 
+    SpriteSize_SQUARE_8x8 = 0, 
+    SpriteSize_SQUARE_16x16 = 1, 
+    SpriteSize_SQUARE_32x32 = 2, 
+    SpriteSize_SQUARE_64x64 = 3, 
+    SpriteSize_WIDE_16x8 = 4, 
+    SpriteSize_WIDE_32x8 = 5, 
+    SpriteSize_WIDE_32x16 = 6, 
+    SpriteSize_WIDE_64x32 = 7, 
+    SpriteSize_TALL_8x16 = 8, 
+    SpriteSize_TALL_8x32 = 9, 
+    SpriteSize_TALL_16x32 = 10, 
+    SpriteSize_TALL_32x64 = 11 
+} SpriteSize;
+
 /* Struct definitions */
 typedef struct _WorldObject { 
     bool has_object_id;
@@ -19,7 +35,15 @@ typedef struct _WorldObject {
     int32_t y; 
     bool has_sprite_id;
     uint32_t sprite_id; 
+    bool has_sprite_size;
+    SpriteSize sprite_size; 
 } WorldObject;
+
+
+/* Helper constants for enums */
+#define _SpriteSize_MIN SpriteSize_SQUARE_8x8
+#define _SpriteSize_MAX SpriteSize_TALL_32x64
+#define _SpriteSize_ARRAYSIZE ((SpriteSize)(SpriteSize_TALL_32x64+1))
 
 
 #ifdef __cplusplus
@@ -27,21 +51,23 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define WorldObject_init_default                 {false, 0, false, 0, false, 0, false, 0}
-#define WorldObject_init_zero                    {false, 0, false, 0, false, 0, false, 0}
+#define WorldObject_init_default                 {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN}
+#define WorldObject_init_zero                    {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define WorldObject_object_id_tag                1
 #define WorldObject_x_tag                        2
 #define WorldObject_y_tag                        3
 #define WorldObject_sprite_id_tag                4
+#define WorldObject_sprite_size_tag              5
 
 /* Struct field encoding specification for nanopb */
 #define WorldObject_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, UINT32,   object_id,         1) \
 X(a, STATIC,   OPTIONAL, INT32,    x,                 2) \
 X(a, STATIC,   OPTIONAL, INT32,    y,                 3) \
-X(a, STATIC,   OPTIONAL, UINT32,   sprite_id,         4)
+X(a, STATIC,   OPTIONAL, UINT32,   sprite_id,         4) \
+X(a, STATIC,   OPTIONAL, UENUM,    sprite_size,       5)
 #define WorldObject_CALLBACK NULL
 #define WorldObject_DEFAULT NULL
 
@@ -51,7 +77,7 @@ extern const pb_msgdesc_t WorldObject_msg;
 #define WorldObject_fields &WorldObject_msg
 
 /* Maximum encoded size of messages (where known) */
-#define WorldObject_size                         34
+#define WorldObject_size                         36
 
 #ifdef __cplusplus
 } /* extern "C" */
