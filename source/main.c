@@ -160,6 +160,10 @@ int main() {
     if (p.dest_x != p.x || p.dest_y != p.y) {
       p.x += move_towards(p.x, p.dest_x);
       p.y += move_towards(p.y, p.dest_y);
+
+      if (p.x == p.dest_x && p.y == p.dest_y) {
+        should_send_status = true;
+      }
     } else {
       s32 horizontalSpeed = key_tri_horz() * 8;
       s32 verticalSpeed = horizontalSpeed == 0 ? key_tri_vert() * 8 : 0;
