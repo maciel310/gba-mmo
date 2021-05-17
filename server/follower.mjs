@@ -1,3 +1,4 @@
+import {SpriteSize} from './proto.mjs';
 import WorldObject from './world_object.mjs';
 
 export default class Follower extends WorldObject {
@@ -37,7 +38,8 @@ export default class Follower extends WorldObject {
       objectId: this.objectId,
       x: this.position.x,
       y: this.position.y,
-      spriteId: this.spriteId
+      spriteId: this.spriteId,
+      spriteSize: SpriteSize.values.TALL_16x32
     };
   }
 }

@@ -1,3 +1,4 @@
+import {SpriteSize} from './proto.mjs';
 import {calculateDistance, moveTowards} from './utils.mjs';
 import WorldObject from './world_object.mjs';
 
@@ -85,7 +86,8 @@ export default class Npc extends WorldObject {
       objectId: this.objectId,
       x: this.position.x,
       y: this.position.y,
-      spriteId: this.spriteId
+      spriteId: this.spriteId,
+      spriteSize: SpriteSize.values.TALL_16x32
     };
   }
 }
