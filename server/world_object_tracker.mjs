@@ -1,5 +1,6 @@
 import Npc from './npc.mjs';
 import MayorConfig from './npcs/mayor.mjs';
+import Resource from './resource.mjs';
 
 export default class WorldObjectTracker {
   nextObjectId = 1;
@@ -9,6 +10,7 @@ export default class WorldObjectTracker {
 
   constructor() {
     this.spawnPermanentNpcs();
+    this.spawnResources();
   }
 
   spawnPermanentNpcs() {
@@ -18,6 +20,12 @@ export default class WorldObjectTracker {
     this.addObject(new Npc(MayorConfig));
     this.addObject(new Npc(MayorConfig));
     this.addObject(new Npc(MayorConfig));
+  }
+
+  spawnResources() {
+    for (let y = 128; y <= 384; y += 32) {
+      this.addObject(new Resource([96, 64], {x: 256, y}, 100));
+    }
   }
 
   addObject(o) {
