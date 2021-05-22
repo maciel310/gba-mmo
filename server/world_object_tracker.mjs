@@ -2,7 +2,7 @@ import Npc from './npc.mjs';
 import MayorConfig from './npcs/mayor.mjs';
 import Resource from './resource.mjs';
 
-export default class WorldObjectTracker {
+class WorldObjectTracker {
   nextObjectId = 1;
 
   // Map of ObjectId to Object
@@ -46,3 +46,5 @@ export default class WorldObjectTracker {
     return [...this.objectMap.values()].map(v => v.toWorldObject());
   }
 }
+
+export default new WorldObjectTracker();

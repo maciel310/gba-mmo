@@ -1,8 +1,9 @@
 import {createSocket} from 'dgram';
 
 import Follower from './follower.mjs';
-import {Direction, PlayerStatus, ServerUpdate} from './proto.mjs';
-import WorldObjectTracker from './world_object_tracker.mjs';
+import Player from './player.mjs';
+import {PlayerStatus, ServerUpdate} from './proto.mjs';
+import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
 
@@ -11,36 +12,29 @@ const TICK_INTERVAL_MS = 1000 / 10;
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
 
-const worldObjectTracker = new WorldObjectTracker();
-
 server.on('error', (err) => {
   console.log('Error from UDP server', err);
 });
 
-const p1Pos = {
-  x: 0,
-  y: 0,
-  direction: Direction.UP,
-};
-worldObjectTracker.addObject(new Follower(p1Pos));
-
-let serverMessage = '';
 server.on('message', (message, clientInfo) => {
-  clientList.set(`${clientInfo.address}:${clientInfo.port}`, {
-    'address': clientInfo.address,
-    'port': clientInfo.port,
-    'lastSeen': new Date()
-  });
+  const clientKey = `${clientInfo.address}:${clientInfo.port}`;
+  const client = clientList.get(clientKey);
+  if (client != undefined) {
+    clientList.get(clientKey).lastSeen = new Date();
+  } else {
+    const player = new Player();
+    worldObjectTracker.addObject(new Follower(player));
+
+    clientList.set(clientKey, {
+      'address': clientInfo.address,
+      'port': clientInfo.port,
+      'lastSeen': new Date(),
+      'player': player
+    });
+  }
   try {
     const p = PlayerStatus.decode(message);
-    p1Pos.x = p.x;
-    p1Pos.y = p.y;
-    p1Pos.direction = p.direction;
-
-    if (p.interactionObjectId) {
-      const o = worldObjectTracker.getObject(p.interactionObjectId);
-      serverMessage = o.interact();
-    }
+    client.player.updateWithStatus(p);
   } catch (e) {
     console.log('Could not decode ', message.toString('hex'));
   }
@@ -50,15 +44,16 @@ setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
 
-  const updateObject = {worldObject: worldObjects};
-  if (serverMessage != '') {
-    updateObject.networkMessage = serverMessage;
-    serverMessage = '';
-  }
-  // TODO: Limit update size to 512 bytes per UDP message.
-  const update = ServerUpdate.encode(updateObject).finish();
-
   for (const clientInfo of clientList.values()) {
+    const player = clientInfo.player;
+    const updateObject = {worldObject: worldObjects};
+    if (player.message != '') {
+      updateObject.networkMessage = player.message;
+      player.message = '';
+    }
+    // TODO: Limit update size to 512 bytes per UDP message.
+    const update = ServerUpdate.encode(updateObject).finish();
+
     server.send(update, clientInfo.port, clientInfo.address);
   }
 }, TICK_INTERVAL_MS);
