@@ -27,7 +27,6 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][48], character_rightTiles, character_leftTilesLen);
   dma3_cpy(&tile_mem[4][64], tree1Tiles, tree1TilesLen);
   dma3_cpy(&tile_mem[4][96], tree2Tiles, tree2TilesLen);
-  dma3_cpy(&tile_mem[4][128], tree3Tiles, tree3TilesLen);
 }
 
 typedef struct {
