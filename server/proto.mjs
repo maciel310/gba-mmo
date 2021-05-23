@@ -6,7 +6,9 @@ const root = protobuf.loadSync([
 ]);
 const ServerUpdate = root.lookupType('ServerUpdate');
 const PlayerStatus = root.lookupType('PlayerStatus');
+const SkillStats = root.lookupType('SkillStats');
 const Direction = root.lookupEnum('Direction');
 const SpriteSize = root.lookupEnum('SpriteSize');
+const Skill = root.lookupEnum('Skill');
 
-export {ServerUpdate, PlayerStatus, Direction, SpriteSize};
+export {ServerUpdate, PlayerStatus, Direction, SpriteSize, SkillStats, Skill};

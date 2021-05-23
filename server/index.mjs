@@ -2,7 +2,7 @@ import {createSocket} from 'dgram';
 
 import Follower from './follower.mjs';
 import Player from './player.mjs';
-import {PlayerStatus, ServerUpdate} from './proto.mjs';
+import {PlayerStatus, ServerUpdate, Skill} from './proto.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
@@ -50,6 +50,10 @@ setInterval(() => {
     if (player.message != '') {
       updateObject.networkMessage = player.message;
       player.message = '';
+    }
+    if (player.hasSkillUpdate) {
+      updateObject.skillStats = player.getSkillStats();
+      player.hasSkillUpdate = false;
     }
     // TODO: Limit update size to 512 bytes per UDP message.
     const update = ServerUpdate.encode(updateObject).finish();

@@ -1,4 +1,4 @@
-import {SpriteSize} from './proto.mjs';
+import {Skill, SpriteSize} from './proto.mjs';
 import WorldObject from './world_object.mjs';
 
 export default class Resource extends WorldObject {
@@ -21,11 +21,12 @@ export default class Resource extends WorldObject {
     Object.assign(this.position, position);
   }
 
-  interact() {
+  interact(player) {
     if (this.spriteIndex == 0) {
       this.spriteIndex = 1;
       this.regenCountdown = this.regenTicks;
-      return 'chop chop';
+      player.addExp(Skill.values.WOODCUTTING, 15);
+      return '';
     }
   }
 
