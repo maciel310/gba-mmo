@@ -7,10 +7,12 @@ message ServerUpdate {
   repeated WorldObject world_object = 1;
 
   optional string network_message = 2 [(nanopb).max_size = 90];
+
+  repeated SkillStats skill_stats = 3;
 }
 
 enum Direction {
-  UNKNOWN = 0;
+  UNKNOWN_DIRECTION = 0;
   UP = 1;
   DOWN = 2;
   LEFT = 3;
@@ -23,4 +25,15 @@ message PlayerStatus {
   optional int32 y = 2;
   optional Direction direction = 3;
   optional int32 interaction_object_id = 4;
+}
+
+enum Skill {
+  UNKNOWN_SKILL = 0;
+  WOODCUTTING = 1;
+}
+
+message SkillStats {
+  optional Skill skill = 1;
+  optional int32 level = 2;
+  optional int32 exp = 3;
 }
