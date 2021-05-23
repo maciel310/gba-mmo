@@ -46,7 +46,7 @@ void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
     obj_set_attr(
       &sprite[i],
       ATTR0_8BPP | sprite_type_lut[o->sprite_size] | ATTR0_REG,
-      sprite_size_lut[o->sprite_size], ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id));
+      sprite_size_lut[o->sprite_size], ATTR2_PALBANK(0) | ATTR2_ID(o->sprite_id) | ATTR2_PRIO(1));
     obj_set_pos(&sprite[i], o->x - worldX, o->y - worldY);
     o->is_on_screen = true;
   } else {

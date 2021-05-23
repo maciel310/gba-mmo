@@ -30,7 +30,7 @@ void text_init() {
 }
 
 void text_display(CSTR text) {
-  win_textbox(1, 8, 160-32+4, 232, 160-4, 8);
+  win_textbox(1, 8, 160-32+4, 232, 160-4, 13);
   tte_write("#{P;es;ci:13}");
   tte_write(text);
 }
