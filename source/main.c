@@ -132,6 +132,10 @@ void show_network_message(CSTR message) {
 }
 
 void show_skill_update(SkillStats s) {
+  if (s.skill == Skill_UNKNOWN_SKILL) {
+    return;
+  }
+
   if (skill_levels[s.skill] != s.level) {
     skill_levels[s.skill] = s.level;
     char msg[90];
