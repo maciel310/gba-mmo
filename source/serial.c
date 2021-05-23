@@ -2,13 +2,15 @@
 #include "world_objects.h"
 
 void (*handle_network_message)(CSTR);
+void (*handle_skill_stats)(SkillStats);
 
-void serial_init(void (*message_callback)(CSTR)) {
+void serial_init(void (*message_callback)(CSTR), void (*skill_stats_callback)(SkillStats)) {
   REG_RCNT = 0;
   REG_SIODATA32 = 0;
   REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
 
   handle_network_message = message_callback;
+  handle_skill_stats = skill_stats_callback;
 
   irq_add(II_SERIAL, handle_serial);
 }
@@ -17,6 +19,14 @@ bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **a
   WorldObject message = WorldObject_init_zero;
   pb_decode(stream, WorldObject_fields, &message);
   update_world_object(message);
+
+  return true;
+}
+
+bool decode_skill_stats(pb_istream_t *stream, const pb_field_t *field, void **arg) {
+  SkillStats message = SkillStats_init_zero;
+  pb_decode(stream, SkillStats_fields, &message);
+  handle_skill_stats(message);
 
   return true;
 }
@@ -40,7 +50,6 @@ void handle_serial() {
     REG_SIODATA32 = 0;
   }
 
-
   REG_SIOCNT |= SION_ENABLE;
   if (expected_message_length == 0) {
     expected_message_length = data;
@@ -57,6 +66,7 @@ void handle_serial() {
     ServerUpdate message = ServerUpdate_init_zero;
     pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length);
     message.world_object.funcs.decode = decode_world_object;
+    message.skill_stats.funcs.decode = decode_skill_stats;
     pb_decode(&stream, ServerUpdate_fields, &message);
 
     if (message.has_network_message) {

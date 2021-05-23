@@ -38,6 +38,8 @@ typedef struct {
 } Player;
 Player p;
 
+s32 skill_levels[_Skill_ARRAYSIZE] = {1, 1};
+
 u32 interaction_world_object_id = 0;
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
@@ -129,6 +131,16 @@ void show_network_message(CSTR message) {
   message_displayed = true;
 }
 
+void show_skill_update(SkillStats s) {
+  if (skill_levels[s.skill] != s.level) {
+    skill_levels[s.skill] = s.level;
+    char msg[90];
+    sprintf(msg, "You've gained a level! You're now at %ld", s.level);
+    text_display(msg);
+    message_displayed = true;
+  }
+}
+
 int main() {
 
   REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
@@ -138,7 +150,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(show_network_message);
+  serial_init(show_network_message, show_skill_update);
   text_init();
 
   dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
