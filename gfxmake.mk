@@ -26,7 +26,7 @@ include $(DEVKITARM)/base_rules
 # General note: use . for the current dir, don't leave them empty.
 
 BUILD	   := build
-GFXDIRS	 := gfx/map gfx/sprites
+GFXDIRS	 := gfx/map gfx/sprites gfx/menus
 GFXLIB	  ?= libgfx.a
 GFXHDR	  ?= all_gfx.h
 

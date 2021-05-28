@@ -145,6 +145,56 @@ void show_skill_update(SkillStats s) {
   }
 }
 
+void load_assets_main() {
+  dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
+  dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
+  dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
+
+  initializeSprites();
+}
+
+void load_assets_menu() {
+  dma3_cpy(&tile_mem[1], skillsTiles, skillsTilesLen);
+  dma3_cpy(&se_mem[0], skillsMap, skillsMapLen);
+  dma3_cpy(pal_bg_mem, skillsPal, skillsPalLen);
+}
+
+void show_menu() {
+  VBlankIntrWait();
+  u32 originalXOffset = REG_BG0HOFS;
+  u32 originalYOffset = REG_BG0VOFS;
+  u32 originalDispCnt = REG_DISPCNT;
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1;
+  REG_BG0HOFS = 0;
+  REG_BG0VOFS = 0;
+  tte_set_margins(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  load_assets_menu();
+
+  char buffer[8];
+  sprintf(buffer, "Level %d", skill_levels[Skill_WOODCUTTING]);
+  tte_write_ex(50, 50, buffer, NULL);
+
+  VBlankIntrDelay(10);
+
+  while(1) {
+    key_poll();
+
+    if (key_hit(KEY_START)) {
+      VBlankIntrDelay(10);
+      break;
+    }
+
+    VBlankIntrWait();
+  }
+
+  VBlankIntrWait();
+  tte_erase_screen();
+  REG_BG0HOFS = originalXOffset;
+  REG_BG0VOFS = originalYOffset;
+  REG_DISPCNT = originalDispCnt;
+  load_assets_main();
+}
+
 int main() {
 
   REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_OBJ | DCNT_OBJ_1D;
@@ -157,11 +207,7 @@ int main() {
   serial_init(show_network_message, show_skill_update);
   text_init();
 
-  dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
-  dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
-  dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
-
-  initializeSprites();
+  load_assets_main();
 
   p.x = p.dest_x = 192;
   p.y = p.dest_y = 152;
@@ -174,6 +220,10 @@ int main() {
     should_send_status = false;
 
     key_poll();
+
+    if (key_hit(KEY_START)) {
+      show_menu();
+    }
 
     if (p.dest_x != p.x || p.dest_y != p.y) {
       p.x += move_towards(p.x, p.dest_x);
