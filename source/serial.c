@@ -51,8 +51,8 @@ void handle_serial() {
   }
 
   REG_SIOCNT |= SION_ENABLE;
-  if (expected_message_length == 0) {
-    expected_message_length = data;
+  if (expected_message_length == 0 && (data & 0xBEEF0000) == 0xBEEF0000) {
+    expected_message_length = data & 0x0000FFFF;
     message_length = 0;
     return;
   }
@@ -63,8 +63,15 @@ void handle_serial() {
   buffer[message_length++] = (data & 0xff);
 
   if (message_length >= expected_message_length) {
+    if (data != 0xDEADBEEF) {
+      // Received incorrect message terminator, ignore message since it is likely corrupt.
+      expected_message_length = 0;
+      message_length = 0;
+      return;
+    }
+
     ServerUpdate message = ServerUpdate_init_zero;
-    pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length);
+    pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length - 4);
     message.world_object.funcs.decode = decode_world_object;
     message.skill_stats.funcs.decode = decode_skill_stats;
     pb_decode(&stream, ServerUpdate_fields, &message);
@@ -75,6 +82,11 @@ void handle_serial() {
 
     expected_message_length = 0;
     message_length = 0;
+  } else if (data == 0xDEADBEEF) {
+    // Received terminator early, set up to expect new message.
+    expected_message_length = 0;
+    message_length = 0;
+    return;
   }
 }
 
