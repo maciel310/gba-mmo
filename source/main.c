@@ -274,7 +274,9 @@ int main() {
         message_displayed = false;
       } else {
         interaction_world_object_id = find_next_to(p.x, p.y, p.d);
-        should_send_status = true;
+        if (interaction_world_object_id != 0) {
+          should_send_status = true;
+        }
       }
     }
 
