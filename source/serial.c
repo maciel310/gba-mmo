@@ -3,14 +3,19 @@
 
 void (*handle_network_message)(CSTR);
 void (*handle_skill_stats)(SkillStats);
+void (*handle_position_update)(PlayerStatus);
 
-void serial_init(void (*message_callback)(CSTR), void (*skill_stats_callback)(SkillStats)) {
+void serial_init(
+    void (*message_callback)(CSTR),
+    void (*skill_stats_callback)(SkillStats),
+    void (*position_update_callback)(PlayerStatus)) {
   REG_RCNT = 0;
   REG_SIODATA32 = 0;
   REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
 
   handle_network_message = message_callback;
   handle_skill_stats = skill_stats_callback;
+  handle_position_update = position_update_callback;
 
   irq_add(II_SERIAL, handle_serial);
 }
@@ -78,6 +83,9 @@ void handle_serial() {
 
     if (message.has_network_message) {
       handle_network_message(message.network_message);
+    }
+    if (message.has_player_status) {
+      handle_position_update(message.player_status);
     }
 
     expected_message_length = 0;

@@ -145,6 +145,11 @@ void show_skill_update(SkillStats s) {
   }
 }
 
+void update_server_player_position(PlayerStatus s) {
+  p.x = p.dest_x = s.x;
+  p.y = p.dest_y = s.y;
+}
+
 void load_assets_main() {
   dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
   dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
@@ -204,7 +209,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(show_network_message, show_skill_update);
+  serial_init(show_network_message, show_skill_update, update_server_player_position);
   text_init();
 
   load_assets_main();
