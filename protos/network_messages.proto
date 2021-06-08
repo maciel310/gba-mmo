@@ -9,6 +9,9 @@ message ServerUpdate {
   optional string network_message = 2 [(nanopb).max_size = 90];
 
   repeated SkillStats skill_stats = 3;
+
+  // Only filled out on initial connection to server, or if server-side change of player location.
+  optional PlayerStatus player_status = 4;
 }
 
 enum Direction {
