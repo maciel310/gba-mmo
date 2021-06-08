@@ -248,10 +248,14 @@ int main() {
         s32 tileXW = (p.x + horizontalSpeed + 8) / 8 + 1;
         s32 tileY = (p.y + verticalSpeed + 16) / 8;
         s32 tileYH = (p.y + verticalSpeed + 16) / 8 + 1;
-        if ((collisionData[tileY] & (1ULL << (64 - tileX))) == 0
+        if (
+          // Map collisions
+          ((collisionData[tileY] & (1ULL << (64 - tileX))) == 0
             && (collisionData[tileY] & (1ULL << (64 - tileXW))) == 0
             && (collisionData[tileYH] & (1ULL << (64 - tileX))) == 0
-            && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0) {
+            && (collisionData[tileYH] & (1ULL << (64 - tileXW))) == 0)
+            // Sprite collisions
+            && sprite_collision_map[tileX][tileY] == false) {
           p.dest_x += horizontalSpeed;
           p.dest_y += verticalSpeed;
         }
@@ -271,6 +275,9 @@ int main() {
       i++;
       current = current->next;
     }
+
+    // TODO: Only regenerate the sprite map if affected sprites change position.
+    regenerate_sprite_collision_map();
 
     // Interact with WorldObject
     if (key_hit(KEY_A)) {

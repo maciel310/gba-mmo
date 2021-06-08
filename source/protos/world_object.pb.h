@@ -37,6 +37,8 @@ typedef struct _WorldObject {
     uint32_t sprite_id; 
     bool has_sprite_size;
     SpriteSize sprite_size; 
+    bool has_is_solid;
+    bool is_solid; 
 } WorldObject;
 
 
@@ -51,8 +53,8 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define WorldObject_init_default                 {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN}
-#define WorldObject_init_zero                    {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN}
+#define WorldObject_init_default                 {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN, false, 0}
+#define WorldObject_init_zero                    {false, 0, false, 0, false, 0, false, 0, false, _SpriteSize_MIN, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define WorldObject_object_id_tag                1
@@ -60,6 +62,7 @@ extern "C" {
 #define WorldObject_y_tag                        3
 #define WorldObject_sprite_id_tag                4
 #define WorldObject_sprite_size_tag              5
+#define WorldObject_is_solid_tag                 6
 
 /* Struct field encoding specification for nanopb */
 #define WorldObject_FIELDLIST(X, a) \
@@ -67,7 +70,8 @@ X(a, STATIC,   OPTIONAL, UINT32,   object_id,         1) \
 X(a, STATIC,   OPTIONAL, INT32,    x,                 2) \
 X(a, STATIC,   OPTIONAL, INT32,    y,                 3) \
 X(a, STATIC,   OPTIONAL, UINT32,   sprite_id,         4) \
-X(a, STATIC,   OPTIONAL, UENUM,    sprite_size,       5)
+X(a, STATIC,   OPTIONAL, UENUM,    sprite_size,       5) \
+X(a, STATIC,   OPTIONAL, BOOL,     is_solid,          6)
 #define WorldObject_CALLBACK NULL
 #define WorldObject_DEFAULT NULL
 
@@ -77,7 +81,7 @@ extern const pb_msgdesc_t WorldObject_msg;
 #define WorldObject_fields &WorldObject_msg
 
 /* Maximum encoded size of messages (where known) */
-#define WorldObject_size                         36
+#define WorldObject_size                         38
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -6,6 +6,8 @@
 
 struct world_object* world_object_head = NULL;
 
+bool sprite_collision_map[64][64];
+
 struct world_object* convert_world_object(WorldObject o) {
   struct world_object* new_object = (struct world_object*) malloc(sizeof(struct world_object));
   new_object->object_id = o.object_id;
@@ -15,6 +17,7 @@ struct world_object* convert_world_object(WorldObject o) {
   new_object->dest_y = o.y;
   new_object->sprite_id = o.sprite_id;
   new_object->sprite_size = o.sprite_size;
+  new_object->is_solid = o.is_solid;
   new_object->next = NULL;
 
   return new_object;
@@ -115,3 +118,40 @@ const u32 sprite_size_lut[12] = {
   ATTR1_SIZE_16x32,
   ATTR1_SIZE_32x64,
 };
+
+const u32 sprite_tile_width_lut[12] = {
+  1, 2, 4, 8,
+  2, 4, 4, 8,
+  1, 1, 2, 4,
+};
+
+const u32 sprite_tile_height_lut[12] = {
+  1, 2, 4, 8,
+  1, 1, 2, 4,
+  2, 4, 4, 8,
+};
+
+void regenerate_sprite_collision_map() {
+  u32 x = 0;
+  u32 y = 0;
+  for (x = 0; x < 64; x++) {
+    for (y = 0; y < 64; y++) {
+      sprite_collision_map[x][y] = false;
+    }
+  }
+
+  struct world_object* current = world_object_head;
+  while (current != NULL) {
+    if (current->is_solid) {
+      s32 tileX = current->dest_x / 8;
+      s32 tileY = current->dest_y / 8;
+      for (s32 x = 0; x < sprite_tile_width_lut[current->sprite_size]; x++) {
+        for (s32 y = 0; y < sprite_tile_height_lut[current->sprite_size]; y++) {
+          sprite_collision_map[tileX + x][tileY + y] = true;
+        }
+      }
+    }
+
+    current = current->next;
+  }
+}
