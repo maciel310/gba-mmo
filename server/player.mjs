@@ -10,6 +10,7 @@ export default class Player {
 
   skillExperience = {};
   hasSkillUpdate = false;
+  hasPositionUpdate = false;
 
   constructor() {
     Object.values(Skill.values).forEach(skill => {
@@ -19,11 +20,17 @@ export default class Player {
 
       this.skillExperience[skill] = 0;
     });
+
+    this.x = 240;
+    this.y = 64;
+    this.hasPositionUpdate = true;
   }
 
   updateWithStatus(playerStatus) {
-    this.x = playerStatus.x;
-    this.y = playerStatus.y;
+    if (!this.hasPositionUpdate) {
+      this.x = playerStatus.x;
+      this.y = playerStatus.y;
+    }
     this.direction = playerStatus.direction;
 
     if (playerStatus.interactionObjectId) {
@@ -43,5 +50,9 @@ export default class Player {
         skill, exp, level: Math.ceil(exp / 100)
       }
     });
+  }
+
+  getPositionUpdate() {
+    return {x: this.x, y: this.y};
   }
 }
