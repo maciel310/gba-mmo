@@ -45,7 +45,8 @@ export default class Resource extends WorldObject {
       x: this.position.x,
       y: this.position.y,
       spriteId: this.spriteIds[this.spriteIndex],
-      spriteSize: SpriteSize.values.SQUARE_32x32
+      spriteSize: SpriteSize.values.SQUARE_32x32,
+      isSolid: true,
     };
   }
 }
