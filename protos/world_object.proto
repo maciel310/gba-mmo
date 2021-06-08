@@ -7,6 +7,8 @@ message WorldObject {
 
   optional uint32 sprite_id = 4;
   optional SpriteSize sprite_size = 5;
+
+  optional bool is_solid = 6;
 }
 
 enum SpriteSize {
