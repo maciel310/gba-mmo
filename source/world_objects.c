@@ -23,10 +23,10 @@ struct world_object* convert_world_object(WorldObject o) {
   return new_object;
 }
 
-void update_world_object(WorldObject o) {
+bool update_world_object(WorldObject o) {
   if (world_object_head == NULL) {
     world_object_head = convert_world_object(o);
-    return;
+    return true;
   }
 
   struct world_object* current = world_object_head;
@@ -36,7 +36,7 @@ void update_world_object(WorldObject o) {
       current->dest_x = o.x;
       current->dest_y = o.y;
       current->sprite_id = o.sprite_id;
-      return;
+      return false;
     } else if (current->object_id > o.object_id) {
       struct world_object* new_object = convert_world_object(o);
       if (previous == NULL) {
@@ -45,7 +45,7 @@ void update_world_object(WorldObject o) {
         previous->next = new_object;
       }
       new_object->next = current;
-      return;
+      return true;
     }
 
     previous = current;
@@ -53,6 +53,7 @@ void update_world_object(WorldObject o) {
   }
 
   previous->next = convert_world_object(o);
+  return true;
 }
 
 // Returns the world_object next to the given position, or 0 if none found.

@@ -25,7 +25,7 @@ extern struct world_object* world_object_head;
 
 extern bool sprite_collision_map[64][64];
 
-void update_world_object(WorldObject o);
+bool update_world_object(WorldObject o);
 void regenerate_sprite_collision_map();
 
 u32 find_next_to(s32 x, s32 y, Direction direction);

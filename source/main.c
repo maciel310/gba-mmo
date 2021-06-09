@@ -150,6 +150,12 @@ void update_server_player_position(PlayerStatus s) {
   p.y = p.dest_y = s.y;
 }
 
+bool new_world_object_received = false;
+void world_object_received(WorldObject w) {
+  bool is_new = update_world_object(w);
+  new_world_object_received = new_world_object_received | is_new;
+}
+
 void load_assets_main() {
   dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
   dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
@@ -209,7 +215,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(show_network_message, show_skill_update, update_server_player_position);
+  serial_init(show_network_message, show_skill_update, update_server_player_position, world_object_received);
   text_init();
 
   load_assets_main();
@@ -264,9 +270,13 @@ int main() {
       }
     }
 
+    bool solid_world_object_moved = false;
     struct world_object* current = world_object_head;
     i = 1;
     while (current != NULL) {
+      if (current->is_solid && current->x != current->dest_x || current->y != current->dest_y) {
+        solid_world_object_moved = true;
+      }
       current->x += move_towards(current->x, current->dest_x);
       current->y += move_towards(current->y, current->dest_y);
 
@@ -276,8 +286,10 @@ int main() {
       current = current->next;
     }
 
-    // TODO: Only regenerate the sprite map if affected sprites change position.
-    regenerate_sprite_collision_map();
+    if (new_world_object_received || solid_world_object_moved) {
+      new_world_object_received = false;
+      regenerate_sprite_collision_map();
+    }
 
     // Interact with WorldObject
     if (key_hit(KEY_A)) {
