@@ -19,6 +19,11 @@ OBJ_ATTR sprite[128];
 s32 worldX = 0;
 s32 worldY = 0;
 
+u8 skillSpriteLut[2] = {
+  0, // Skill_UNKNOWN_SKILL
+  128, // Skill_WOODCUTTING
+};
+
 void initializeSprites(void) {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
   dma3_cpy(&tile_mem[4][0], character_upTiles, character_downTilesLen);
@@ -27,6 +32,8 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][48], character_rightTiles, character_leftTilesLen);
   dma3_cpy(&tile_mem[4][64], tree1Tiles, tree1TilesLen);
   dma3_cpy(&tile_mem[4][96], tree2Tiles, tree2TilesLen);
+
+  dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_WOODCUTTING]], axeTiles, axeTilesLen);
 }
 
 typedef struct {
@@ -41,6 +48,9 @@ Player p;
 s32 skill_levels[_Skill_ARRAYSIZE] = {1, 1};
 
 u32 interaction_world_object_id = 0;
+
+Skill active_skill = Skill_UNKNOWN_SKILL;
+bool new_active_skill = false;
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
@@ -75,6 +85,14 @@ void update_player_sprite_entry() {
   }
   obj_set_attr(&sprite[0], ATTR0_8BPP | ATTR0_TALL | ATTR0_REG, ATTR1_SIZE_16x32, ATTR2_PALBANK(0) | ATTR2_ID(sprite_id));
   obj_set_pos(&sprite[0], PLAYER_SCREEN_X, PLAYER_SCREEN_Y);
+
+  if (active_skill != Skill_UNKNOWN_SKILL) {
+    obj_unhide(&sprite[1], ATTR0_MODE(0));
+    obj_set_attr(&sprite[1], ATTR0_8BPP | ATTR0_SQUARE | ATTR0_REG, ATTR1_SIZE_16x16, ATTR2_PALBANK(0) | ATTR2_ID(skillSpriteLut[Skill_WOODCUTTING]));
+    obj_set_pos(&sprite[1], PLAYER_SCREEN_X, PLAYER_SCREEN_Y - 16);
+  } else {
+    obj_hide(&sprite[1]);
+  }
 }
 
 void update_player_direction(s32 h, s32 v) {
@@ -156,6 +174,13 @@ void update_state_with_server_update(ServerUpdate s) {
   }
   if (s.has_player_status) {
     update_server_player_position(s.player_status);
+  }
+  if (s.has_interacting_skill && active_skill != s.interacting_skill) {
+    active_skill = s.interacting_skill;
+    new_active_skill = true;
+  } else if (!s.has_interacting_skill && active_skill != Skill_UNKNOWN_SKILL) {
+    active_skill = Skill_UNKNOWN_SKILL;
+    new_active_skill = true;
   }
 }
 
@@ -281,7 +306,7 @@ int main() {
 
     bool solid_world_object_moved = false;
     struct world_object* current = world_object_head;
-    i = 1;
+    i = 2;
     while (current != NULL) {
       if (current->is_solid && (current->x != current->dest_x || current->y != current->dest_y)) {
         solid_world_object_moved = true;
@@ -324,6 +349,10 @@ int main() {
 
     REG_BG0HOFS = worldX;
     REG_BG0VOFS = worldY;
+
+    if (new_active_skill) {
+      update_player_sprite_entry();
+    }
 
     oam_copy(oam_mem, sprite, 128);
   }
