@@ -274,7 +274,7 @@ int main() {
     struct world_object* current = world_object_head;
     i = 1;
     while (current != NULL) {
-      if (current->is_solid && current->x != current->dest_x || current->y != current->dest_y) {
+      if (current->is_solid && (current->x != current->dest_x || current->y != current->dest_y)) {
         solid_world_object_moved = true;
       }
       current->x += move_towards(current->x, current->dest_x);
