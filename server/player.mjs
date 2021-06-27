@@ -1,4 +1,4 @@
-import {Direction, Skill} from './proto.mjs';
+import {Direction, MapLocation, Skill} from './proto.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 export default class Player {
@@ -13,6 +13,8 @@ export default class Player {
   hasPositionUpdate = false;
 
   resourceInteraction = undefined;
+
+  currentMap = MapLocation.values.LUMBER_RIDGE;
 
   constructor() {
     Object.values(Skill.values).forEach(skill => {

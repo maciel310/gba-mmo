@@ -1,3 +1,4 @@
+import {MapLocation} from './proto.mjs';
 import {SpriteSize} from './proto.mjs';
 import {calculateDistance, moveTowards} from './utils.mjs';
 import WorldObject from './world_object.mjs';
@@ -45,7 +46,13 @@ export default class Npc extends WorldObject {
     return true;
   }
 
-  interact() {
+  interact(player) {
+    if (player.currentMap == MapLocation.values.LUMBER_RIDGE) {
+      player.currentMap = MapLocation.values.VAR_ROCK;
+    } else {
+      player.currentMap = MapLocation.values.LUMBER_RIDGE;
+    }
+
     const msg = this.messages[this.messagesIndex];
     this.messagesIndex = (this.messagesIndex + 1) % this.messages.length;
     return msg;

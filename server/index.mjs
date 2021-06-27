@@ -2,7 +2,7 @@ import {createSocket} from 'dgram';
 
 import Follower from './follower.mjs';
 import Player from './player.mjs';
-import {PlayerStatus, ServerUpdate, Skill} from './proto.mjs';
+import {MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
@@ -48,7 +48,10 @@ setInterval(() => {
     const player = clientInfo.player;
     player.tick();
 
-    const updateObject = {worldObject: worldObjects};
+    const updateObject = {
+      worldObject: worldObjects,
+      currentMap: player.currentMap
+    };
     if (player.message != '') {
       updateObject.networkMessage = player.message;
       player.message = '';

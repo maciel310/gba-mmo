@@ -10,5 +10,14 @@ const SkillStats = root.lookupType('SkillStats');
 const Direction = root.lookupEnum('Direction');
 const SpriteSize = root.lookupEnum('SpriteSize');
 const Skill = root.lookupEnum('Skill');
+const MapLocation = root.lookupEnum('MapLocation');
 
-export {ServerUpdate, PlayerStatus, Direction, SpriteSize, SkillStats, Skill};
+export {
+  ServerUpdate,
+  PlayerStatus,
+  Direction,
+  SpriteSize,
+  SkillStats,
+  Skill,
+  MapLocation
+};
