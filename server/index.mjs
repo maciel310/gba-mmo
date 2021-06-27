@@ -61,6 +61,10 @@ setInterval(() => {
       updateObject.playerStatus = player.getPositionUpdate();
       player.hasPositionUpdate = false;
     }
+    if (player.resourceInteraction != undefined) {
+      updateObject.interactingSkill = player.resourceInteraction.skillType;
+    }
+
     // TODO: Limit update size to 512 bytes per UDP message.
     const update = ServerUpdate.encode(updateObject).finish();
 
