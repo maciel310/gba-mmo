@@ -10,7 +10,8 @@
 #include "serial.h"
 #include "text.h"
 
-#include "outside.h"
+#include "lumber_ridge.h"
+#include "var_rock.h"
 
 #define PLAYER_SCREEN_X 112
 #define PLAYER_SCREEN_Y 72
@@ -52,8 +53,9 @@ u32 interaction_world_object_id = 0;
 Skill active_skill = Skill_UNKNOWN_SKILL;
 bool new_active_skill = false;
 
-MapLocation current_map = MapLocation_LUMBER_RIDGE;
 MapLocation new_map = MapLocation_UNKNOWN_MAP;
+MapLocation current_map = MapLocation_LUMBER_RIDGE;
+const u64 *collisionData = LUMBER_RIDGE_collisionData;
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
@@ -199,13 +201,15 @@ void world_object_received(WorldObject w) {
 
 void load_assets_main() {
   if (current_map == MapLocation_LUMBER_RIDGE) {
-    dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
-    dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
-    dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
+    dma3_cpy(&tile_mem[1], lumber_ridge_mapTiles, lumber_ridge_mapTilesLen);
+    dma3_cpy(&se_mem[0], lumber_ridge_mapMap, lumber_ridge_mapMapLen);
+    dma3_cpy(pal_bg_mem, lumber_ridge_mapPal, lumber_ridge_mapPalLen);
+    collisionData = LUMBER_RIDGE_collisionData;
   } else if (current_map == MapLocation_VAR_ROCK) {
-    dma3_cpy(&tile_mem[1], var_rockTiles, var_rockTilesLen);
-    dma3_cpy(&se_mem[0], var_rockMap, var_rockMapLen);
-    dma3_cpy(pal_bg_mem, var_rockPal, var_rockPalLen);
+    dma3_cpy(&tile_mem[1], var_rock_mapTiles, var_rock_mapTilesLen);
+    dma3_cpy(&se_mem[0], var_rock_mapMap, var_rock_mapMapLen);
+    dma3_cpy(pal_bg_mem, var_rock_mapPal, var_rock_mapPalLen);
+    collisionData = VAR_ROCK_collisionData;
   }
 
   initializeSprites();
