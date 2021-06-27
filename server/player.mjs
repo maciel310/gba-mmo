@@ -39,6 +39,10 @@ export default class Player {
 
   updateWithStatus(playerStatus) {
     if (!this.hasPositionUpdate) {
+      if (this.x != playerStatus.x || this.y != playerStatus.y) {
+        this.resourceInteraction = undefined;
+      }
+
       this.x = playerStatus.x;
       this.y = playerStatus.y;
     }
