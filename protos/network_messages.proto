@@ -12,6 +12,8 @@ message ServerUpdate {
 
   // Only filled out on initial connection to server, or if server-side change of player location.
   optional PlayerStatus player_status = 4;
+
+  optional Skill interacting_skill = 5;
 }
 
 enum Direction {
