@@ -46,10 +46,12 @@ export default class Player {
 
     if (playerStatus.interactionObjectId) {
       const o = worldObjectTracker.getObject(playerStatus.interactionObjectId);
-      if (o.isSkillResource()) {
-        this.resourceInteraction = o;
-      } else {
-        this.message = o.interact(this);
+      if (o.canInteract()) {
+        if (o.isSkillResource()) {
+          this.resourceInteraction = o;
+        } else {
+          this.message = o.interact(this);
+        }
       }
     }
   }

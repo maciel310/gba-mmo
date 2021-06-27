@@ -24,9 +24,12 @@ export default class Resource extends WorldObject {
     Object.assign(this.position, position);
   }
 
+  canInteract() {
+    return this.spriteIndex == 0;
+  }
+
   interact(player) {
-    if (this.spriteIndex == 0 &&
-        Math.random() <= this.successChancePercentage) {
+    if (this.canInteract() && Math.random() <= this.successChancePercentage) {
       this.spriteIndex = 1;
       this.regenCountdown = this.regenTicks;
       player.addExp(this.skillType, 15);

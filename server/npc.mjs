@@ -41,6 +41,10 @@ export default class Npc extends WorldObject {
     this.wanderVector = this.wanderVectorOptions[0];
   }
 
+  canInteract() {
+    return true;
+  }
+
   interact() {
     const msg = this.messages[this.messagesIndex];
     this.messagesIndex = (this.messagesIndex + 1) % this.messages.length;

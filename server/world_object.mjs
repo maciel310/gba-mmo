@@ -14,4 +14,12 @@ export default class WorldObject {
   isSkillResource() {
     return false;
   }
+
+  canInteract() {
+    return false;
+  }
+
+  interact() {
+    return '';
+  }
 }
