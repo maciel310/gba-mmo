@@ -150,6 +150,15 @@ void update_server_player_position(PlayerStatus s) {
   p.y = p.dest_y = s.y;
 }
 
+void update_state_with_server_update(ServerUpdate s) {
+  if (s.has_network_message) {
+    show_network_message(s.network_message);
+  }
+  if (s.has_player_status) {
+    update_server_player_position(s.player_status);
+  }
+}
+
 bool new_world_object_received = false;
 void world_object_received(WorldObject w) {
   bool is_new = update_world_object(w);
@@ -215,7 +224,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(show_network_message, show_skill_update, update_server_player_position, world_object_received);
+  serial_init(update_state_with_server_update, show_skill_update, world_object_received);
   text_init();
 
   load_assets_main();

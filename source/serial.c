@@ -1,22 +1,19 @@
 #include "serial.h"
 
-void (*handle_network_message)(CSTR);
+void (*handle_server_update)(ServerUpdate);
 void (*handle_skill_stats)(SkillStats);
-void (*handle_position_update)(PlayerStatus);
 void (*handle_world_object)(WorldObject);
 
 void serial_init(
-    void (*message_callback)(CSTR),
+    void (*server_update_callback)(ServerUpdate),
     void (*skill_stats_callback)(SkillStats),
-    void (*position_update_callback)(PlayerStatus),
     void (*world_object_callback)(WorldObject)) {
   REG_RCNT = 0;
   REG_SIODATA32 = 0;
   REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
 
-  handle_network_message = message_callback;
+  handle_server_update = server_update_callback;
   handle_skill_stats = skill_stats_callback;
-  handle_position_update = position_update_callback;
   handle_world_object = world_object_callback;
 
   irq_add(II_SERIAL, handle_serial);
@@ -83,12 +80,7 @@ void handle_serial() {
     message.skill_stats.funcs.decode = decode_skill_stats;
     pb_decode(&stream, ServerUpdate_fields, &message);
 
-    if (message.has_network_message) {
-      handle_network_message(message.network_message);
-    }
-    if (message.has_player_status) {
-      handle_position_update(message.player_status);
-    }
+    handle_server_update(message);
 
     expected_message_length = 0;
     message_length = 0;
