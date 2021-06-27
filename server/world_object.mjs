@@ -10,4 +10,8 @@ export default class WorldObject {
   tick() {}
 
   toWorldObject() {}
+
+  isSkillResource() {
+    return false;
+  }
 }

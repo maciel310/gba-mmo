@@ -10,6 +10,9 @@ export default class Resource extends WorldObject {
   regenTicks = 0;
   regenCountdown = 0;
 
+  successChancePercentage = 0.05;
+  skillType = Skill.values.WOODCUTTING;
+
   constructor(spriteIds, position, regenTicks) {
     super();
 
@@ -22,12 +25,16 @@ export default class Resource extends WorldObject {
   }
 
   interact(player) {
-    if (this.spriteIndex == 0) {
+    if (this.spriteIndex == 0 &&
+        Math.random() <= this.successChancePercentage) {
       this.spriteIndex = 1;
       this.regenCountdown = this.regenTicks;
-      player.addExp(Skill.values.WOODCUTTING, 15);
-      return '';
+      player.addExp(this.skillType, 15);
+
+      return true;
     }
+
+    return false;
   }
 
   tick() {
@@ -48,5 +55,9 @@ export default class Resource extends WorldObject {
       spriteSize: SpriteSize.values.SQUARE_32x32,
       isSolid: true,
     };
+  }
+
+  isSkillResource() {
+    return true;
   }
 }

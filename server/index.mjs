@@ -46,6 +46,8 @@ setInterval(() => {
 
   for (const clientInfo of clientList.values()) {
     const player = clientInfo.player;
+    player.tick();
+
     const updateObject = {worldObject: worldObjects};
     if (player.message != '') {
       updateObject.networkMessage = player.message;

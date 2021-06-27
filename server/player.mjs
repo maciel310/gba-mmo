@@ -12,6 +12,8 @@ export default class Player {
   hasSkillUpdate = false;
   hasPositionUpdate = false;
 
+  resourceInteraction = undefined;
+
   constructor() {
     Object.values(Skill.values).forEach(skill => {
       if (skill == Skill.values.UNKNOWN_SKILL) {
@@ -22,8 +24,17 @@ export default class Player {
     });
 
     this.x = 240;
-    this.y = 64;
+    this.y = 240;
     this.hasPositionUpdate = true;
+  }
+
+  tick() {
+    if (this.resourceInteraction != undefined) {
+      let success = this.resourceInteraction.interact(this);
+      if (success) {
+        this.resourceInteraction = undefined;
+      }
+    }
   }
 
   updateWithStatus(playerStatus) {
@@ -35,7 +46,11 @@ export default class Player {
 
     if (playerStatus.interactionObjectId) {
       const o = worldObjectTracker.getObject(playerStatus.interactionObjectId);
-      this.message = o.interact(this);
+      if (o.isSkillResource()) {
+        this.resourceInteraction = o;
+      } else {
+        this.message = o.interact(this);
+      }
     }
   }
 
