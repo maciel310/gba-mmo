@@ -19,6 +19,12 @@ typedef enum _Direction {
     Direction_RIGHT = 4 
 } Direction;
 
+typedef enum _MapLocation { 
+    MapLocation_UNKNOWN_MAP = 0, 
+    MapLocation_LUMBER_RIDGE = 1, 
+    MapLocation_VAR_ROCK = 2 
+} MapLocation;
+
 typedef enum _Skill { 
     Skill_UNKNOWN_SKILL = 0, 
     Skill_WOODCUTTING = 1 
@@ -55,6 +61,8 @@ typedef struct _ServerUpdate {
     PlayerStatus player_status; 
     bool has_interacting_skill;
     Skill interacting_skill; 
+    bool has_current_map;
+    MapLocation current_map; 
 } ServerUpdate;
 
 
@@ -62,6 +70,10 @@ typedef struct _ServerUpdate {
 #define _Direction_MIN Direction_UNKNOWN_DIRECTION
 #define _Direction_MAX Direction_RIGHT
 #define _Direction_ARRAYSIZE ((Direction)(Direction_RIGHT+1))
+
+#define _MapLocation_MIN MapLocation_UNKNOWN_MAP
+#define _MapLocation_MAX MapLocation_VAR_ROCK
+#define _MapLocation_ARRAYSIZE ((MapLocation)(MapLocation_VAR_ROCK+1))
 
 #define _Skill_MIN Skill_UNKNOWN_SKILL
 #define _Skill_MAX Skill_WOODCUTTING
@@ -73,10 +85,10 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 
@@ -93,6 +105,7 @@ extern "C" {
 #define ServerUpdate_skill_stats_tag             3
 #define ServerUpdate_player_status_tag           4
 #define ServerUpdate_interacting_skill_tag       5
+#define ServerUpdate_current_map_tag             6
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -100,7 +113,8 @@ X(a, CALLBACK, REPEATED, MESSAGE,  world_object,      1) \
 X(a, STATIC,   OPTIONAL, STRING,   network_message,   2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  skill_stats,       3) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  player_status,     4) \
-X(a, STATIC,   OPTIONAL, UENUM,    interacting_skill,   5)
+X(a, STATIC,   OPTIONAL, UENUM,    interacting_skill,   5) \
+X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject

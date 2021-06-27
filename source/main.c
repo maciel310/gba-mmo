@@ -52,6 +52,9 @@ u32 interaction_world_object_id = 0;
 Skill active_skill = Skill_UNKNOWN_SKILL;
 bool new_active_skill = false;
 
+MapLocation current_map = MapLocation_LUMBER_RIDGE;
+MapLocation new_map = MapLocation_UNKNOWN_MAP;
+
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
     obj_unhide(&sprite[i], ATTR0_MODE(0));
@@ -182,6 +185,10 @@ void update_state_with_server_update(ServerUpdate s) {
     active_skill = Skill_UNKNOWN_SKILL;
     new_active_skill = true;
   }
+
+  if (s.current_map != current_map) {
+    new_map = s.current_map;
+  }
 }
 
 bool new_world_object_received = false;
@@ -191,9 +198,15 @@ void world_object_received(WorldObject w) {
 }
 
 void load_assets_main() {
-  dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
-  dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
-  dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
+  if (current_map == MapLocation_LUMBER_RIDGE) {
+    dma3_cpy(&tile_mem[1], outside_mapTiles, outside_mapTilesLen);
+    dma3_cpy(&se_mem[0], outside_mapMap, outside_mapMapLen);
+    dma3_cpy(pal_bg_mem, outside_mapPal, outside_mapPalLen);
+  } else if (current_map == MapLocation_VAR_ROCK) {
+    dma3_cpy(&tile_mem[1], var_rockTiles, var_rockTilesLen);
+    dma3_cpy(&se_mem[0], var_rockMap, var_rockMapLen);
+    dma3_cpy(pal_bg_mem, var_rockPal, var_rockPalLen);
+  }
 
   initializeSprites();
 }
@@ -343,6 +356,13 @@ int main() {
     }
 
     VBlankIntrWait();
+
+    if (new_map != MapLocation_UNKNOWN_MAP) {
+      current_map = new_map;
+      new_map = MapLocation_UNKNOWN_MAP;
+
+      load_assets_main();
+    }
 
     worldX = p.x - PLAYER_SCREEN_X;
     worldY = p.y - PLAYER_SCREEN_Y;
