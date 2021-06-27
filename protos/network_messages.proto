@@ -14,6 +14,8 @@ message ServerUpdate {
   optional PlayerStatus player_status = 4;
 
   optional Skill interacting_skill = 5;
+
+  optional MapLocation current_map = 6;
 }
 
 enum Direction {
@@ -24,6 +26,11 @@ enum Direction {
   RIGHT = 4;
 }
 
+enum MapLocation {
+  UNKNOWN_MAP = 0;
+  LUMBER_RIDGE = 1;
+  VAR_ROCK = 2;
+}
 
 message PlayerStatus {
   optional int32 x = 1;
