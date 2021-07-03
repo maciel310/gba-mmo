@@ -16,7 +16,7 @@ export default class Player {
 
   currentMap = MapLocation.values.LUMBER_RIDGE;
 
-  constructor() {
+  constructor(playerToken) {
     Object.values(Skill.values).forEach(skill => {
       if (skill == Skill.values.UNKNOWN_SKILL) {
         return;

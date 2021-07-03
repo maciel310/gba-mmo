@@ -1,8 +1,7 @@
 import {createSocket} from 'dgram';
 
-import Follower from './follower.mjs';
 import Player from './player.mjs';
-import {MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
+import {PlayerStatus, ServerUpdate} from './proto.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
@@ -19,24 +18,37 @@ server.on('error', (err) => {
 server.on('message', (message, clientInfo) => {
   const clientKey = `${clientInfo.address}:${clientInfo.port}`;
   const client = clientList.get(clientKey);
-  if (client != undefined) {
-    clientList.get(clientKey).lastSeen = new Date();
-  } else {
-    const player = new Player();
-    worldObjectTracker.addObject(new Follower(player));
+  if (message.toString().startsWith('login~~')) {
+    if (client == undefined) {
+      const playerToken = message.toString().replace(/^login~~/, '').trim();
+      if (playerToken != 'cooookie') {
+        server.send('failed', clientInfo.port, clientInfo.address);
+        return;
+      }
 
-    clientList.set(clientKey, {
-      'address': clientInfo.address,
-      'port': clientInfo.port,
-      'lastSeen': new Date(),
-      'player': player
-    });
-  }
-  try {
-    const p = PlayerStatus.decode(message);
-    client.player.updateWithStatus(p);
-  } catch (e) {
-    console.log('Could not decode ', message.toString('hex'));
+      const player = new Player(playerToken);
+      server.send('success', clientInfo.port, clientInfo.address);
+
+      clientList.set(clientKey, {
+        'address': clientInfo.address,
+        'port': clientInfo.port,
+        'lastSeen': new Date(),
+        'player': player
+      });
+    }
+  } else if (message.toString().startsWith('create~~')) {
+    const [username, email] =
+        message.toString().replace(/^create~~/, '').trim().split('~~');
+    server.send('success~~cooookie', clientInfo.port, clientInfo.address);
+  } else {
+    try {
+      const p = PlayerStatus.decode(message);
+      client.player.updateWithStatus(p);
+
+      clientList.get(clientKey).lastSeen = new Date();
+    } catch (e) {
+      console.log('Could not decode ', message.toString('hex'));
+    }
   }
 });
 
