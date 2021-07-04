@@ -1,7 +1,12 @@
+import {randomBytes} from 'crypto'
+
 import {Direction, MapLocation, Skill} from './proto.mjs';
+import {getPlayer, setPlayer} from './storage.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 export default class Player {
+  playerToken = '';
+
   x = 0;
   y = 0;
   direction = Direction.UP;
@@ -16,18 +21,39 @@ export default class Player {
 
   currentMap = MapLocation.values.LUMBER_RIDGE;
 
-  constructor(playerToken) {
+  static async load(playerToken) {
+    const playerObject = await getPlayer(playerToken);
+    if (!playerObject) {
+      return null;
+    }
+
+    const p = new Player();
+    p.skillExperience = playerObject.skillExp;
+    p.x = playerObject.x;
+    p.y = playerObject.y;
+    p.hasPositionUpdate = true;
+    p.playerToken = playerToken;
+
+    return p;
+  }
+
+  static async create(username, email) {
+    const playerToken =
+        randomBytes(10).toString('base64').replace(/[^a-zA-Z0-9]/g, '');
+
+    const playerObject =
+        {playerToken, username, email, skillExp: [], x: 240, y: 240};
     Object.values(Skill.values).forEach(skill => {
       if (skill == Skill.values.UNKNOWN_SKILL) {
         return;
       }
 
-      this.skillExperience[skill] = 0;
+      playerObject.skillExp[skill] = 0;
     });
 
-    this.x = 240;
-    this.y = 240;
-    this.hasPositionUpdate = true;
+    await setPlayer(playerToken, playerObject);
+
+    return playerToken;
   }
 
   tick() {
@@ -47,6 +73,7 @@ export default class Player {
 
       this.x = playerStatus.x;
       this.y = playerStatus.y;
+      this.savePlayerStatus({x: this.x, y: this.y});
     }
     this.direction = playerStatus.direction;
 
@@ -65,6 +92,16 @@ export default class Player {
   addExp(skill, amount) {
     this.skillExperience[skill] += amount;
     this.hasSkillUpdate = true;
+
+    this.savePlayerStatus({skillExp: this.skillExperience});
+  }
+
+  async savePlayerStatus(changes) {
+    const playerObject = await getPlayer(this.playerToken);
+
+    Object.assign(playerObject, changes);
+
+    await setPlayer(this.playerToken, playerObject);
   }
 
   getSkillStats() {

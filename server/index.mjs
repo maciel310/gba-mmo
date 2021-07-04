@@ -15,18 +15,19 @@ server.on('error', (err) => {
   console.log('Error from UDP server', err);
 });
 
-server.on('message', (message, clientInfo) => {
+server.on('message', async (message, clientInfo) => {
   const clientKey = `${clientInfo.address}:${clientInfo.port}`;
   const client = clientList.get(clientKey);
   if (message.toString().startsWith('login~~')) {
     if (client == undefined) {
       const playerToken = message.toString().replace(/^login~~/, '').trim();
-      if (playerToken != 'cooookie') {
+
+      const player = await Player.load(playerToken);
+      if (player == null) {
         server.send('failed', clientInfo.port, clientInfo.address);
         return;
       }
 
-      const player = new Player(playerToken);
       server.send('success', clientInfo.port, clientInfo.address);
 
       clientList.set(clientKey, {
@@ -39,7 +40,8 @@ server.on('message', (message, clientInfo) => {
   } else if (message.toString().startsWith('create~~')) {
     const [username, email] =
         message.toString().replace(/^create~~/, '').trim().split('~~');
-    server.send('success~~cooookie', clientInfo.port, clientInfo.address);
+    const cookie = await Player.create(username, email);
+    server.send(`success~~${cookie}`, clientInfo.port, clientInfo.address);
   } else {
     try {
       const p = PlayerStatus.decode(message);
