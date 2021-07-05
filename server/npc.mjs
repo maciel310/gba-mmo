@@ -48,9 +48,9 @@ export default class Npc extends WorldObject {
 
   interact(player) {
     if (player.currentMap == MapLocation.values.LUMBER_RIDGE) {
-      player.currentMap = MapLocation.values.VAR_ROCK;
+      player.teleport(MapLocation.values.VAR_ROCK, 400, 400);
     } else {
-      player.currentMap = MapLocation.values.LUMBER_RIDGE;
+      player.teleport(MapLocation.values.LUMBER_RIDGE, 400, 400);
     }
 
     const msg = this.messages[this.messagesIndex];

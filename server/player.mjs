@@ -9,6 +9,7 @@ export default class Player {
 
   x = 0;
   y = 0;
+  currentMap = MapLocation.values.TOWN;
   direction = Direction.UP;
 
   message = '';
@@ -19,7 +20,6 @@ export default class Player {
 
   resourceInteraction = undefined;
 
-  currentMap = MapLocation.values.LUMBER_RIDGE;
 
   static async load(playerToken) {
     const playerObject = await getPlayer(playerToken);
@@ -31,6 +31,7 @@ export default class Player {
     p.skillExperience = playerObject.skillExp;
     p.x = playerObject.x;
     p.y = playerObject.y;
+    p.currentMap = playerObject.currentMap;
     p.hasPositionUpdate = true;
     p.playerToken = playerToken;
 
@@ -87,6 +88,15 @@ export default class Player {
         }
       }
     }
+  }
+
+  teleport(map, x, y) {
+    this.x = x;
+    this.y = y;
+    this.currentMap = map;
+    this.hasPositionUpdate = true;
+
+    this.savePlayerStatus({x: this.x, y: this.y, currentMap: this.currentMap});
   }
 
   addExp(skill, amount) {
