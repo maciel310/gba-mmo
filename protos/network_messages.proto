@@ -30,6 +30,7 @@ enum MapLocation {
   UNKNOWN_MAP = 0;
   LUMBER_RIDGE = 1;
   VAR_ROCK = 2;
+  TOWN = 3;
 }
 
 message PlayerStatus {
