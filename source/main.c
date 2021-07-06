@@ -59,6 +59,8 @@ MapLocation new_map = MapLocation_UNKNOWN_MAP;
 MapLocation current_map = MapLocation_TOWN;
 const u64 *collisionData = TOWN_collisionData;
 
+bool first_server_update_received = false;
+
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
     obj_unhide(&sprite[i], ATTR0_MODE(0));
@@ -176,6 +178,8 @@ void update_server_player_position(PlayerStatus s) {
 }
 
 void update_state_with_server_update(ServerUpdate s) {
+  first_server_update_received = true;
+
   if (s.has_network_message) {
     show_network_message(s.network_message);
   }
@@ -228,6 +232,12 @@ void load_assets_menu() {
   dma3_cpy(pal_bg_mem, skillsPal, skillsPalLen);
 }
 
+void load_assets_connecting() {
+  dma3_cpy(&tile_mem[1], connectingTiles, connectingTilesLen);
+  dma3_cpy(&se_mem[0], connectingMap, connectingMapLen);
+  dma3_cpy(pal_bg_mem, connectingPal, connectingPalLen);
+}
+
 void show_menu() {
   VBlankIntrWait();
   u32 originalXOffset = REG_BG0HOFS;
@@ -275,6 +285,16 @@ int main() {
   oam_init(sprite, 128);
   serial_init(update_state_with_server_update, show_skill_update, world_object_received);
   text_init();
+
+  load_assets_connecting();
+
+  while (!first_server_update_received) {
+    VBlankIntrWait();
+  }
+
+  // Delay an additional 5 seconds to ensure we're fully loaded.
+  // TODO: Remove this hack once the disconnect bug is fixed.
+  VBlankIntrDelay(60 * 5);
 
   load_assets_main();
 
