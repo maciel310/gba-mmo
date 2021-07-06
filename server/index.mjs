@@ -89,7 +89,7 @@ setInterval(() => {
     });
 
     const updateObject = {
-      worldObject: worldObjects,
+      worldObject: worldObjects.get(player.currentMap),
       currentMap: player.currentMap
     };
     if (player.message != '') {

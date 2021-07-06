@@ -1,5 +1,6 @@
 import Npc from './npc.mjs';
 import MayorConfig from './npcs/mayor.mjs';
+import {MapLocation} from './proto.mjs';
 import Resource from './resource.mjs';
 
 class WorldObjectTracker {
@@ -14,23 +15,21 @@ class WorldObjectTracker {
   }
 
   spawnPermanentNpcs() {
-    this.addObject(new Npc(MayorConfig));
-    this.addObject(new Npc(MayorConfig));
-    this.addObject(new Npc(MayorConfig));
-    this.addObject(new Npc(MayorConfig));
-    this.addObject(new Npc(MayorConfig));
-    this.addObject(new Npc(MayorConfig));
+    this.addObject(new Npc(MayorConfig), MapLocation.values.TOWN);
   }
 
   spawnResources() {
     for (let y = 128; y <= 384; y += 32) {
-      this.addObject(new Resource([96, 64], {x: 256, y}, 100));
+      this.addObject(
+          new Resource([96, 64], {x: 256, y}, 100),
+          MapLocation.values.LUMBER_RIDGE);
     }
   }
 
-  addObject(o) {
+  addObject(o, map) {
     this.objectMap.set(this.nextObjectId, o);
     o.setObjectId(this.nextObjectId);
+    o.setMap(map);
     this.nextObjectId++;
   }
 
@@ -43,7 +42,20 @@ class WorldObjectTracker {
   }
 
   getWorldObjects() {
-    return [...this.objectMap.values()].map(v => v.toWorldObject());
+    const worldObjectMap = new Map();
+    Object.values(MapLocation.values).forEach(map => {
+      if (map == MapLocation.values.UNKNOWN_MAP) {
+        return;
+      }
+
+      worldObjectMap.set(map, []);
+    });
+
+    for (let object of this.objectMap.values()) {
+      worldObjectMap.get(object.map).push(object.toWorldObject());
+    }
+
+    return worldObjectMap;
   }
 }
 
