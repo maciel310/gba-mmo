@@ -23,7 +23,7 @@ s32 worldY = 0;
 
 u8 skillSpriteLut[2] = {
   0, // Skill_UNKNOWN_SKILL
-  128, // Skill_WOODCUTTING
+  160, // Skill_WOODCUTTING
 };
 
 void initializeSprites(void) {
@@ -34,6 +34,7 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][48], character_rightTiles, character_leftTilesLen);
   dma3_cpy(&tile_mem[4][64], tree1Tiles, tree1TilesLen);
   dma3_cpy(&tile_mem[4][96], tree2Tiles, tree2TilesLen);
+  dma3_cpy(&tile_mem[4][128], chestTiles, chestTilesLen);
 
   dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_WOODCUTTING]], axeTiles, axeTilesLen);
 }
