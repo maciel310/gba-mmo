@@ -1,7 +1,8 @@
 import {createSocket} from 'dgram';
 
 import Player from './player.mjs';
-import {PlayerStatus, ServerUpdate} from './proto.mjs';
+import {MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
+import Teleporter from './teleporter.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
@@ -54,6 +55,27 @@ server.on('message', async (message, clientInfo) => {
   }
 });
 
+const teleporters = new Map();
+teleporters.set(MapLocation.values.TOWN, [
+  new Teleporter(
+      432, 240, 32, 32, MapLocation.values.TOWN, MapLocation.values.VAR_ROCK,
+      200, 224),
+  new Teleporter(
+      432, 344, 32, 32, MapLocation.values.TOWN,
+      MapLocation.values.LUMBER_RIDGE, 200, 224),
+]);
+teleporters.set(MapLocation.values.LUMBER_RIDGE, [
+  new Teleporter(
+      144, 224, 32, 32, MapLocation.values.LUMBER_RIDGE,
+      MapLocation.values.TOWN, 392, 336),
+]);
+teleporters.set(MapLocation.values.VAR_ROCK, [
+  new Teleporter(
+      144, 224, 32, 32, MapLocation.values.VAR_ROCK, MapLocation.values.TOWN,
+      392, 232),
+]);
+
+
 setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
@@ -61,6 +83,10 @@ setInterval(() => {
   for (const clientInfo of clientList.values()) {
     const player = clientInfo.player;
     player.tick();
+
+    teleporters.get(player.currentMap).forEach(teleporter => {
+      teleporter.tick(player);
+    });
 
     const updateObject = {
       worldObject: worldObjects,
