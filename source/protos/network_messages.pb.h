@@ -22,7 +22,8 @@ typedef enum _Direction {
 typedef enum _MapLocation { 
     MapLocation_UNKNOWN_MAP = 0, 
     MapLocation_LUMBER_RIDGE = 1, 
-    MapLocation_VAR_ROCK = 2 
+    MapLocation_VAR_ROCK = 2, 
+    MapLocation_TOWN = 3 
 } MapLocation;
 
 typedef enum _Skill { 
@@ -72,8 +73,8 @@ typedef struct _ServerUpdate {
 #define _Direction_ARRAYSIZE ((Direction)(Direction_RIGHT+1))
 
 #define _MapLocation_MIN MapLocation_UNKNOWN_MAP
-#define _MapLocation_MAX MapLocation_VAR_ROCK
-#define _MapLocation_ARRAYSIZE ((MapLocation)(MapLocation_VAR_ROCK+1))
+#define _MapLocation_MAX MapLocation_TOWN
+#define _MapLocation_ARRAYSIZE ((MapLocation)(MapLocation_TOWN+1))
 
 #define _Skill_MIN Skill_UNKNOWN_SKILL
 #define _Skill_MAX Skill_WOODCUTTING

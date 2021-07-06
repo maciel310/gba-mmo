@@ -12,6 +12,7 @@
 
 #include "lumber_ridge.h"
 #include "var_rock.h"
+#include "town.h"
 
 #define PLAYER_SCREEN_X 112
 #define PLAYER_SCREEN_Y 72
@@ -210,6 +211,11 @@ void load_assets_main() {
     dma3_cpy(&se_mem[0], var_rock_mapMap, var_rock_mapMapLen);
     dma3_cpy(pal_bg_mem, var_rock_mapPal, var_rock_mapPalLen);
     collisionData = VAR_ROCK_collisionData;
+  } else if (current_map == MapLocation_TOWN) {
+    dma3_cpy(&tile_mem[1], town_mapTiles, town_mapTilesLen);
+    dma3_cpy(&se_mem[0], town_mapMap, town_mapMapLen);
+    dma3_cpy(pal_bg_mem, town_mapPal, town_mapPalLen);
+    collisionData = TOWN_collisionData;
   }
 
   initializeSprites();
