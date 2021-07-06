@@ -372,6 +372,10 @@ int main() {
       new_map = MapLocation_UNKNOWN_MAP;
 
       load_assets_main();
+      clear_all_world_objects();
+      for (u32 i = 2; i < 128; i++) {
+        obj_hide(&sprite[i]);
+      }
     }
 
     worldX = p.x - PLAYER_SCREEN_X;

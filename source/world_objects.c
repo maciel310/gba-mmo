@@ -23,6 +23,17 @@ struct world_object* convert_world_object(WorldObject o) {
   return new_object;
 }
 
+void clear_all_world_objects() {
+  struct world_object* current = world_object_head;
+  while (current != NULL) {
+    struct world_object* to_delete = current;
+    current = current->next;
+
+    free(to_delete);
+  }
+  world_object_head = NULL;
+}
+
 bool update_world_object(WorldObject o) {
   if (world_object_head == NULL) {
     world_object_head = convert_world_object(o);
