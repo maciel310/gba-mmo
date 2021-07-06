@@ -1,3 +1,4 @@
+import Chest from './chest.mjs';
 import Npc from './npc.mjs';
 import MayorConfig from './npcs/mayor.mjs';
 import {MapLocation} from './proto.mjs';
@@ -12,6 +13,8 @@ class WorldObjectTracker {
   constructor() {
     this.spawnPermanentNpcs();
     this.spawnResources();
+
+    this.addObject(new Chest(), MapLocation.values.TOWN);
   }
 
   spawnPermanentNpcs() {
