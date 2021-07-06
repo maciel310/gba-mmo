@@ -55,8 +55,8 @@ Skill active_skill = Skill_UNKNOWN_SKILL;
 bool new_active_skill = false;
 
 MapLocation new_map = MapLocation_UNKNOWN_MAP;
-MapLocation current_map = MapLocation_LUMBER_RIDGE;
-const u64 *collisionData = LUMBER_RIDGE_collisionData;
+MapLocation current_map = MapLocation_TOWN;
+const u64 *collisionData = TOWN_collisionData;
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
   if (o->x > worldX - 32 && o->x < worldX + SCREEN_WIDTH && o->y > worldY - 32 && o->y < worldY + SCREEN_HEIGHT) {
