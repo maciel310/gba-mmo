@@ -16,6 +16,9 @@ message ServerUpdate {
   optional Skill interacting_skill = 5;
 
   optional MapLocation current_map = 6;
+
+  // NOTE: If max_count is updated change in server and ROM.
+  repeated Item inventory = 7 [(nanopb).max_count = 18];
 }
 
 enum Direction {
@@ -49,4 +52,9 @@ message SkillStats {
   optional Skill skill = 1;
   optional int32 level = 2;
   optional int32 exp = 3;
+}
+
+enum Item {
+  UNKNOWN_ITEM = 0;
+  WOOD = 1;
 }
