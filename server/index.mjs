@@ -1,7 +1,7 @@
 import {createSocket} from 'dgram';
 
 import Player from './player.mjs';
-import {MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
+import {Item, MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
 import Teleporter from './teleporter.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
@@ -90,7 +90,8 @@ setInterval(() => {
 
     const updateObject = {
       worldObject: worldObjects.get(player.currentMap),
-      currentMap: player.currentMap
+      currentMap: player.currentMap,
+      inventory: player.inventory,
     };
     if (player.message != '') {
       updateObject.networkMessage = player.message;

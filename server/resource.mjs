@@ -1,4 +1,4 @@
-import {Skill, SpriteSize} from './proto.mjs';
+import {Item, Skill, SpriteSize} from './proto.mjs';
 import WorldObject from './world_object.mjs';
 
 export default class Resource extends WorldObject {
@@ -12,6 +12,7 @@ export default class Resource extends WorldObject {
 
   successChancePercentage = 0.05;
   skillType = Skill.values.WOODCUTTING;
+  itemType = Item.values.WOOD;
 
   constructor(spriteIds, position, regenTicks) {
     super();
@@ -33,6 +34,7 @@ export default class Resource extends WorldObject {
       this.spriteIndex = 1;
       this.regenCountdown = this.regenTicks;
       player.addExp(this.skillType, 15);
+      player.addItem(this.itemType);
 
       return true;
     }
