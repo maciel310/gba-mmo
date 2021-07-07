@@ -373,8 +373,6 @@ int main() {
 
   load_assets_main();
 
-  p.x = p.dest_x = 192;
-  p.y = p.dest_y = 152;
   p.d = Direction_DOWN;
   update_player_sprite_entry();
 
