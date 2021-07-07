@@ -31,6 +31,11 @@ typedef enum _Skill {
     Skill_WOODCUTTING = 1 
 } Skill;
 
+typedef enum _Item { 
+    Item_UNKNOWN_ITEM = 0, 
+    Item_WOOD = 1 
+} Item;
+
 /* Struct definitions */
 typedef struct _PlayerStatus { 
     bool has_x;
@@ -64,6 +69,8 @@ typedef struct _ServerUpdate {
     Skill interacting_skill; 
     bool has_current_map;
     MapLocation current_map; 
+    pb_size_t inventory_count;
+    Item inventory[24]; 
 } ServerUpdate;
 
 
@@ -80,16 +87,20 @@ typedef struct _ServerUpdate {
 #define _Skill_MAX Skill_WOODCUTTING
 #define _Skill_ARRAYSIZE ((Skill)(Skill_WOODCUTTING+1))
 
+#define _Item_MIN Item_UNKNOWN_ITEM
+#define _Item_MAX Item_WOOD
+#define _Item_ARRAYSIZE ((Item)(Item_WOOD+1))
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 
@@ -107,6 +118,7 @@ extern "C" {
 #define ServerUpdate_player_status_tag           4
 #define ServerUpdate_interacting_skill_tag       5
 #define ServerUpdate_current_map_tag             6
+#define ServerUpdate_inventory_tag               7
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -115,7 +127,8 @@ X(a, STATIC,   OPTIONAL, STRING,   network_message,   2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  skill_stats,       3) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  player_status,     4) \
 X(a, STATIC,   OPTIONAL, UENUM,    interacting_skill,   5) \
-X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6)
+X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6) \
+X(a, STATIC,   REPEATED, UENUM,    inventory,         7)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject

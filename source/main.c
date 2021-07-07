@@ -26,7 +26,7 @@ u8 skillSpriteLut[2] = {
   160, // Skill_WOODCUTTING
 };
 
-void initializeSprites(void) {
+void initialize_sprites() {
   dma3_cpy(pal_obj_mem, spritesSharedPal, spritesSharedPalLen);
   dma3_cpy(&tile_mem[4][0], character_upTiles, character_downTilesLen);
   dma3_cpy(&tile_mem[4][16], character_downTiles, character_upTilesLen);
@@ -39,12 +39,27 @@ void initializeSprites(void) {
   dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_WOODCUTTING]], axeTiles, axeTilesLen);
 }
 
+u8 itemSpriteLut[_Item_ARRAYSIZE] = {
+  0, // UNKNOWN_ITEM
+  0, // WOOD
+};
+
+void initialize_menu_sprites() {
+  dma3_cpy(pal_obj_mem, menu_spritesSharedPal, menu_spritesSharedPalLen);
+
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_WOOD]], woodTiles, woodTilesLen);
+}
+
+// NOTE: If updated change in proto and server code.
+#define INVENTORY_SIZE 18
+
 typedef struct {
   s32 x;
   s32 y;
   s32 dest_x;
   s32 dest_y;
   Direction d;
+  Item inventory[INVENTORY_SIZE];
 } Player;
 Player p;
 
@@ -197,6 +212,10 @@ void update_state_with_server_update(ServerUpdate s) {
   if (s.current_map != current_map) {
     new_map = s.current_map;
   }
+
+  for (u32 i = 0; i < INVENTORY_SIZE; i++) {
+    p.inventory[i] = s.inventory[i];
+  }
 }
 
 bool new_world_object_received = false;
@@ -223,7 +242,7 @@ void load_assets_main() {
     collisionData = TOWN_collisionData;
   }
 
-  initializeSprites();
+  initialize_sprites();
 }
 
 void load_assets_skills() {
@@ -252,16 +271,46 @@ void show_skill_stats() {
   tte_write_ex(50, 50, buffer, NULL);
 }
 
-void show_inventory() {
+void show_inventory_sprite(OBJ_ATTR* menu_sprite, u32 i, u32 row, u32 col, Item item) {
+  obj_unhide(&menu_sprite[i], ATTR0_MODE(0));
+  obj_set_attr(
+    &menu_sprite[i],
+    ATTR0_8BPP | ATTR0_SQUARE | ATTR0_REG,
+    ATTR1_SIZE_32x32, ATTR2_PALBANK(0) | itemSpriteLut[item] | ATTR2_PRIO(1));
+  obj_set_pos(&menu_sprite[i], 12 + col * 36, 32 + row * 40);
+}
+
+#define COLUMN_COUNT 6
+#define ROW_COUNT INVENTORY_SIZE / COLUMN_COUNT
+void show_inventory(OBJ_ATTR* menu_sprite) {
   load_assets_inventory();
+  initialize_menu_sprites();
+
+  for (u32 row = 0; row < ROW_COUNT; row++) {
+    for (u32 col = 0; col < COLUMN_COUNT; col++) {
+      u32 i = row * COLUMN_COUNT + col;
+
+      Item item = p.inventory[i];
+      if (item == Item_UNKNOWN_ITEM) {
+        obj_hide(&menu_sprite[i]);
+      } else {
+        show_inventory_sprite(menu_sprite, i, row, col, item);
+      }
+    }
+  }
 }
 
 void show_menu() {
   VBlankIntrWait();
+
+  OBJ_ATTR menu_sprite[128];
+  oam_init(menu_sprite, 128);
+  oam_copy(oam_mem, menu_sprite, 128);
+
   u32 originalXOffset = REG_BG0HOFS;
   u32 originalYOffset = REG_BG0VOFS;
   u32 originalDispCnt = REG_DISPCNT;
-  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1;
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
   REG_BG0HOFS = 0;
   REG_BG0VOFS = 0;
   tte_set_margins(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -274,17 +323,21 @@ void show_menu() {
     key_poll();
 
     if (key_hit(KEY_L)) {
+      oam_init(menu_sprite, 128);
       tte_erase_screen();
       show_skill_stats();
     } else if (key_hit(KEY_R)) {
+      oam_init(menu_sprite, 128);
       tte_erase_screen();
-      show_inventory();
+      show_inventory(menu_sprite);
     } else if (key_hit(KEY_START)) {
       VBlankIntrDelay(10);
       break;
     }
 
     VBlankIntrWait();
+
+    oam_copy(oam_mem, menu_sprite, 128);
   }
 
   VBlankIntrWait();
@@ -293,6 +346,7 @@ void show_menu() {
   REG_BG0VOFS = originalYOffset;
   REG_DISPCNT = originalDispCnt;
   load_assets_main();
+  oam_copy(oam_mem, sprite, 128);
 }
 
 int main() {

@@ -26,7 +26,7 @@ include $(DEVKITARM)/base_rules
 # General note: use . for the current dir, don't leave them empty.
 
 BUILD	   := build
-GFXDIRS	 := gfx/map gfx/sprites gfx/menus
+GFXDIRS	 := gfx/map gfx/sprites gfx/menus gfx/menu_sprites
 GFXLIB	  ?= libgfx.a
 GFXHDR	  ?= all_gfx.h
 
@@ -40,10 +40,11 @@ GFXEXTS	 := png bmp
 # OSPECIALS	 : added to OFILES
 
 export SPRITES	?= $(notdir $(wildcard gfx/sprites/*.png))
+export MENU_SPRITES	?= $(notdir $(wildcard gfx/menu_sprites/*.png))
 
 # Key exception variables
-export GFXSPECIALS  := $(SPRITES)
-OSPECIALS		   := sprites.o
+export GFXSPECIALS  := $(SPRITES) $(MENU_SPRITES)
+OSPECIALS		   := sprites.o menu_sprites.o
 
 
 # ---------------------------------------------------------------------
@@ -157,6 +158,11 @@ $(GFXHDR) : $(OFILES)
 # ---------------------------------------------------------------------
 
 sprites.s sprites.h : sprites.grit $(SPRITES)
+	@echo $(notdir $^)
+	grit $(sort $(filter %.png,$^)) -o$@ -ff $<
+
+
+menu_sprites.s menu_sprites.h : sprites.grit $(MENU_SPRITES)
 	@echo $(notdir $^)
 	grit $(sort $(filter %.png,$^)) -o$@ -ff $<
 

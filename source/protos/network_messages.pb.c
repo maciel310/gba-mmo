@@ -6,13 +6,14 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(ServerUpdate, ServerUpdate, AUTO)
+PB_BIND(ServerUpdate, ServerUpdate, 2)
 
 
 PB_BIND(PlayerStatus, PlayerStatus, AUTO)
 
 
 PB_BIND(SkillStats, SkillStats, AUTO)
+
 
 
 
