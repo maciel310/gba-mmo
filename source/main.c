@@ -226,16 +226,34 @@ void load_assets_main() {
   initializeSprites();
 }
 
-void load_assets_menu() {
+void load_assets_skills() {
   dma3_cpy(&tile_mem[1], skillsTiles, skillsTilesLen);
   dma3_cpy(&se_mem[0], skillsMap, skillsMapLen);
   dma3_cpy(pal_bg_mem, skillsPal, skillsPalLen);
+}
+
+void load_assets_inventory() {
+  dma3_cpy(&tile_mem[1], inventoryTiles, inventoryTilesLen);
+  dma3_cpy(&se_mem[0], inventoryMap, inventoryMapLen);
+  dma3_cpy(pal_bg_mem, inventoryPal, inventoryPalLen);
 }
 
 void load_assets_connecting() {
   dma3_cpy(&tile_mem[1], connectingTiles, connectingTilesLen);
   dma3_cpy(&se_mem[0], connectingMap, connectingMapLen);
   dma3_cpy(pal_bg_mem, connectingPal, connectingPalLen);
+}
+
+void show_skill_stats() {
+  load_assets_skills();
+
+  char buffer[8];
+  sprintf(buffer, "Level %d", skill_levels[Skill_WOODCUTTING]);
+  tte_write_ex(50, 50, buffer, NULL);
+}
+
+void show_inventory() {
+  load_assets_inventory();
 }
 
 void show_menu() {
@@ -247,18 +265,21 @@ void show_menu() {
   REG_BG0HOFS = 0;
   REG_BG0VOFS = 0;
   tte_set_margins(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  load_assets_menu();
 
-  char buffer[8];
-  sprintf(buffer, "Level %d", skill_levels[Skill_WOODCUTTING]);
-  tte_write_ex(50, 50, buffer, NULL);
+  show_skill_stats();
 
   VBlankIntrDelay(10);
 
   while(1) {
     key_poll();
 
-    if (key_hit(KEY_START)) {
+    if (key_hit(KEY_L)) {
+      tte_erase_screen();
+      show_skill_stats();
+    } else if (key_hit(KEY_R)) {
+      tte_erase_screen();
+      show_inventory();
+    } else if (key_hit(KEY_START)) {
       VBlankIntrDelay(10);
       break;
     }
