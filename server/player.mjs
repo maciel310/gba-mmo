@@ -27,6 +27,8 @@ export default class Player {
 
   changes = undefined;
 
+  npcState = {};
+
   static async load(playerToken) {
     const playerObject = await getPlayer(playerToken);
     if (!playerObject) {
@@ -41,6 +43,7 @@ export default class Player {
     p.hasPositionUpdate = true;
     p.playerToken = playerToken;
     p.inventory = playerObject.inventory;
+    Object.assign(p.npcState, playerObject.npcState);
 
     return p;
   }
@@ -139,6 +142,12 @@ export default class Player {
 
     this.inventory.push(item);
     this.savePlayerStatus({inventory: this.inventory});
+  }
+
+  updateNpcState(npc, state) {
+    this.npcState[npc] = state;
+
+    this.savePlayerStatus({npcState: this.npcState});
   }
 
   async maybeSaveChanges() {

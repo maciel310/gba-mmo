@@ -17,14 +17,10 @@ export default class Npc extends WorldObject {
   wanderVector = {x: 0, y: 0};
   wanderVectorOptions = [];
 
-  messages = [];
-  messagesIndex = 0;
-
   constructor(config) {
     super();
 
     this.spriteId = config.spriteId;
-    this.messages = config.messages;
 
     this.wanderRadius = config.wanderRadius;
 
@@ -46,11 +42,7 @@ export default class Npc extends WorldObject {
     return true;
   }
 
-  interact(player) {
-    const msg = this.messages[this.messagesIndex];
-    this.messagesIndex = (this.messagesIndex + 1) % this.messages.length;
-    return msg;
-  }
+  interact(player) {}
 
   tick() {
     if (this.position.x != this.destinationPosition.x ||
