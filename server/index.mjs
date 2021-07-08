@@ -50,7 +50,7 @@ server.on('message', async (message, clientInfo) => {
 
       clientList.get(clientKey).lastSeen = new Date();
     } catch (e) {
-      console.log('Could not decode ', message.toString('hex'));
+      console.log('Error processing: ', message.toString('hex'), e);
     }
   }
 });
