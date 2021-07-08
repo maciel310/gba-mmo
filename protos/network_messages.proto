@@ -57,4 +57,5 @@ message SkillStats {
 enum Item {
   UNKNOWN_ITEM = 0;
   WOOD = 1;
+  ROCK = 2;
 }
