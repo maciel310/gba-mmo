@@ -46,6 +46,10 @@ message PlayerStatus {
   optional int32 y = 2;
   optional Direction direction = 3;
   optional int32 interaction_object_id = 4;
+
+  // Bank operations.
+  optional int32 deposit_inventory_index = 5;
+  optional Item withdraw_bank_item = 6;
 }
 
 enum Skill {
