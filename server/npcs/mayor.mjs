@@ -8,6 +8,8 @@ const config = {
   'spriteId': 16,
 }
 
+const NPC_TYPE = 'MAYOR';
+
 const ConversationStates = {
   FIRST_WELCOME_1: 'FIRST_WELCOME_1',
   FIRST_WELCOME_2: 'FIRST_WELCOME_2',
@@ -49,8 +51,8 @@ export default class MayorNpc extends Npc {
 
   updateConversationState(player) {
     let currentState = {};
-    if (player.npcState.hasOwnProperty('MAYOR')) {
-      currentState = player.npcState['MAYOR'];
+    if (player.npcState.hasOwnProperty(NPC_TYPE)) {
+      currentState = player.npcState[NPC_TYPE];
     }
 
     if (currentState.conversation == undefined) {
@@ -79,6 +81,6 @@ export default class MayorNpc extends Npc {
       currentState.conversation = ConversationStates.AFTER_QUEST;
     }
 
-    player.updateNpcState('MAYOR', currentState);
+    player.updateNpcState(NPC_TYPE, currentState);
   }
 }
