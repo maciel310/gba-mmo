@@ -80,6 +80,8 @@ MapLocation new_map = MapLocation_UNKNOWN_MAP;
 MapLocation current_map = MapLocation_TOWN;
 const u64 *collisionData = TOWN_collisionData;
 
+Interface launch_interface = Interface_UNKNOWN_INTERFACE;
+
 bool first_server_update_received = false;
 
 void updateWorldObjectSpriteEntry(int i, struct world_object *o) {
@@ -204,6 +206,9 @@ void update_state_with_server_update(ServerUpdate s) {
   if (s.has_network_message) {
     show_network_message(s.network_message);
   }
+  if (s.has_launch_interface) {
+    launch_interface = s.launch_interface;
+  }
   if (s.has_player_status) {
     update_server_player_position(s.player_status);
   }
@@ -263,6 +268,12 @@ void load_assets_inventory() {
   dma3_cpy(pal_bg_mem, inventoryPal, inventoryPalLen);
 }
 
+void load_assets_bank() {
+  dma3_cpy(&tile_mem[1], bankTiles, bankTilesLen);
+  dma3_cpy(&se_mem[0], bankMap, bankMapLen);
+  dma3_cpy(pal_bg_mem, bankPal, bankPalLen);
+}
+
 void load_assets_connecting() {
   dma3_cpy(&tile_mem[1], connectingTiles, connectingTilesLen);
   dma3_cpy(&se_mem[0], connectingMap, connectingMapLen);
@@ -288,10 +299,12 @@ void show_inventory_sprite(OBJ_ATTR* menu_sprite, u32 i, u32 row, u32 col, Item 
 
 #define COLUMN_COUNT 6
 #define ROW_COUNT INVENTORY_SIZE / COLUMN_COUNT
-void show_inventory(OBJ_ATTR* menu_sprite) {
+void show_inventory() {
   load_assets_inventory();
   initialize_menu_sprites();
+}
 
+void update_inventory(OBJ_ATTR* menu_sprite) {
   for (u32 row = 0; row < ROW_COUNT; row++) {
     for (u32 col = 0; col < COLUMN_COUNT; col++) {
       u32 i = row * COLUMN_COUNT + col;
@@ -305,6 +318,17 @@ void show_inventory(OBJ_ATTR* menu_sprite) {
     }
   }
 }
+
+void show_bank(OBJ_ATTR* menu_sprite) {
+  load_assets_bank();
+
+}
+
+typedef enum _menu_type { 
+  MENU_TYPE_SKILL_STATS = 0, 
+  MENU_TYPE_INVENTORY = 1,
+  MENU_TYPE_BANK = 2,
+} MenuType;
 
 void show_menu() {
   VBlankIntrWait();
@@ -321,24 +345,61 @@ void show_menu() {
   REG_BG0VOFS = 0;
   tte_set_margins(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  show_skill_stats();
+  MenuType menu_type = MENU_TYPE_SKILL_STATS;
+  if (launch_interface == Interface_BANK) {
+    menu_type = MENU_TYPE_BANK;
+    launch_interface = Interface_UNKNOWN_INTERFACE;
+  }
 
-  VBlankIntrDelay(10);
+  bool menu_type_changed = true;
 
   while(1) {
     key_poll();
 
-    if (key_hit(KEY_L)) {
-      oam_init(menu_sprite, 128);
-      tte_erase_screen();
-      show_skill_stats();
-    } else if (key_hit(KEY_R)) {
-      oam_init(menu_sprite, 128);
-      tte_erase_screen();
-      show_inventory(menu_sprite);
-    } else if (key_hit(KEY_START)) {
+    if (menu_type == MENU_TYPE_BANK) {
+      // TODO: Implement key handling for Bank UI
+    } else {
+      if (key_hit(KEY_L)) {
+        menu_type = MENU_TYPE_SKILL_STATS;
+        menu_type_changed = true;
+      } else if (key_hit(KEY_R)) {
+        menu_type = MENU_TYPE_INVENTORY;
+        menu_type_changed = true;
+      }
+    }
+
+    if (key_hit(KEY_START)) {
       VBlankIntrDelay(10);
       break;
+    }
+
+    switch (menu_type) {
+      case MENU_TYPE_SKILL_STATS:
+        if (menu_type_changed) {
+          menu_type_changed = false;
+          oam_init(menu_sprite, 128);
+          tte_erase_screen();
+          show_skill_stats();
+        }
+        break;
+      case MENU_TYPE_INVENTORY:
+        if (menu_type_changed) {
+          menu_type_changed = false;
+          oam_init(menu_sprite, 128);
+          tte_erase_screen();
+          show_inventory();
+        }
+
+        update_inventory(menu_sprite);
+        break;
+      case MENU_TYPE_BANK:
+        if (menu_type_changed) {
+          menu_type_changed = false;
+          oam_init(menu_sprite, 128);
+          tte_erase_screen();
+          show_bank(menu_sprite);
+        }
+        break;
     }
 
     VBlankIntrWait();
@@ -390,6 +451,10 @@ int main() {
     key_poll();
 
     if (key_hit(KEY_START)) {
+      show_menu();
+    }
+
+    if (launch_interface != Interface_UNKNOWN_INTERFACE) {
       show_menu();
     }
 

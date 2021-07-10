@@ -39,6 +39,11 @@ typedef enum _Item {
     Item_PICKAXE = 4 
 } Item;
 
+typedef enum _Interface { 
+    Interface_UNKNOWN_INTERFACE = 0, 
+    Interface_BANK = 1 
+} Interface;
+
 /* Struct definitions */
 typedef struct _PlayerStatus { 
     bool has_x;
@@ -75,6 +80,8 @@ typedef struct _ServerUpdate {
     /* NOTE: If max_count is updated change in server and ROM. */
     pb_size_t inventory_count;
     Item inventory[18]; 
+    bool has_launch_interface;
+    Interface launch_interface; 
 } ServerUpdate;
 
 
@@ -95,16 +102,20 @@ typedef struct _ServerUpdate {
 #define _Item_MAX Item_PICKAXE
 #define _Item_ARRAYSIZE ((Item)(Item_PICKAXE+1))
 
+#define _Interface_MIN Interface_UNKNOWN_INTERFACE
+#define _Interface_MAX Interface_BANK
+#define _Interface_ARRAYSIZE ((Interface)(Interface_BANK+1))
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 
@@ -123,6 +134,7 @@ extern "C" {
 #define ServerUpdate_interacting_skill_tag       5
 #define ServerUpdate_current_map_tag             6
 #define ServerUpdate_inventory_tag               7
+#define ServerUpdate_launch_interface_tag        8
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -132,7 +144,8 @@ X(a, CALLBACK, REPEATED, MESSAGE,  skill_stats,       3) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  player_status,     4) \
 X(a, STATIC,   OPTIONAL, UENUM,    interacting_skill,   5) \
 X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6) \
-X(a, STATIC,   REPEATED, UENUM,    inventory,         7)
+X(a, STATIC,   REPEATED, UENUM,    inventory,         7) \
+X(a, STATIC,   OPTIONAL, UENUM,    launch_interface,   8)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject
