@@ -41,14 +41,18 @@ void initialize_sprites() {
 
 u8 itemSpriteLut[_Item_ARRAYSIZE] = {
   0, // UNKNOWN_ITEM
-  0, // WOOD
-  32, // ROCK
-  64, // HATCHET
-  96, // PICKAXE
+  32, // WOOD
+  64, // ROCK
+  96, // HATCHET
+  128, // PICKAXE
 };
+
+#define MENU_OUTLINE_32_SPRITE 0
 
 void initialize_menu_sprites() {
   dma3_cpy(pal_obj_mem, menu_spritesSharedPal, menu_spritesSharedPalLen);
+
+  dma3_cpy(&tile_mem[4][MENU_OUTLINE_32_SPRITE], outline_32Tiles, outline_32TilesLen);
 
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_WOOD]], woodTiles, woodTilesLen);
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_ROCK]], rockTiles, rockTilesLen);
@@ -274,10 +278,16 @@ void load_assets_inventory() {
   dma3_cpy(pal_bg_mem, inventoryPal, inventoryPalLen);
 }
 
-void load_assets_bank() {
-  dma3_cpy(&tile_mem[1], bankTiles, bankTilesLen);
-  dma3_cpy(&se_mem[0], bankMap, bankMapLen);
-  dma3_cpy(pal_bg_mem, bankPal, bankPalLen);
+void load_assets_bank_withdraw() {
+  dma3_cpy(&tile_mem[1], bank_withdrawTiles, bank_withdrawTilesLen);
+  dma3_cpy(&se_mem[0], bank_withdrawMap, bank_withdrawMapLen);
+  dma3_cpy(pal_bg_mem, bank_withdrawPal, bank_withdrawPalLen);
+}
+
+void load_assets_bank_deposit() {
+  dma3_cpy(&tile_mem[1], bank_depositTiles, bank_depositTilesLen);
+  dma3_cpy(&se_mem[0], bank_depositMap, bank_depositMapLen);
+  dma3_cpy(pal_bg_mem, bank_depositPal, bank_depositPalLen);
 }
 
 void load_assets_connecting() {
@@ -303,6 +313,15 @@ void show_inventory_sprite(OBJ_ATTR* menu_sprite, u32 i, u32 row, u32 col, Item 
   obj_set_pos(&menu_sprite[i], 12 + col * 36, 32 + row * 40);
 }
 
+void show_outline_sprite(OBJ_ATTR* menu_sprite, u32 x, u32 y) {
+  obj_unhide(&menu_sprite[127], ATTR0_MODE(0));
+  obj_set_attr(
+    &menu_sprite[127],
+    ATTR0_8BPP | ATTR0_SQUARE | ATTR0_REG,
+    ATTR1_SIZE_32x32, ATTR2_PALBANK(0) | MENU_OUTLINE_32_SPRITE | ATTR2_PRIO(1));
+  obj_set_pos(&menu_sprite[127], x, y);
+}
+
 #define COLUMN_COUNT 6
 #define ROW_COUNT INVENTORY_SIZE / COLUMN_COUNT
 void show_inventory() {
@@ -325,25 +344,39 @@ void update_inventory(OBJ_ATTR* menu_sprite) {
   }
 }
 
-void show_bank(OBJ_ATTR* menu_sprite) {
-  load_assets_bank();
+void show_bank_withdraw() {
+  load_assets_bank_withdraw();
+  initialize_menu_sprites();
+}
 
+void update_bank_withdraw(OBJ_ATTR* menu_sprite) {
+}
 
-  char buffer[30];
-  sprintf(buffer, "Wood %d", bank[Item_WOOD]);
-  tte_write_ex(50, 50, buffer, NULL);
-  sprintf(buffer, "Rock %d", bank[Item_ROCK]);
-  tte_write_ex(50, 60, buffer, NULL);
-  sprintf(buffer, "Hatchet %d", bank[Item_HATCHET]);
-  tte_write_ex(50, 70, buffer, NULL);
-  sprintf(buffer, "Pickaxe %d", bank[Item_PICKAXE]);
-  tte_write_ex(50, 80, buffer, NULL);
+void show_bank_deposit() {
+  load_assets_bank_deposit();
+  initialize_menu_sprites();
+}
+
+void update_bank_deposit(OBJ_ATTR* menu_sprite) {
+  for (u32 row = 0; row < ROW_COUNT; row++) {
+    for (u32 col = 0; col < COLUMN_COUNT; col++) {
+      u32 i = row * COLUMN_COUNT + col;
+
+      Item item = p.inventory[i];
+      if (item == Item_UNKNOWN_ITEM) {
+        obj_hide(&menu_sprite[i]);
+      } else {
+        show_inventory_sprite(menu_sprite, i, row, col, item);
+      }
+    }
+  }
 }
 
 typedef enum _menu_type { 
   MENU_TYPE_SKILL_STATS = 0, 
   MENU_TYPE_INVENTORY = 1,
-  MENU_TYPE_BANK = 2,
+  MENU_TYPE_WITHDRAW = 2,
+  MENU_TYPE_DEPOSIT = 3,
 } MenuType;
 
 void show_menu() {
@@ -362,9 +395,14 @@ void show_menu() {
   tte_set_margins(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   MenuType menu_type = MENU_TYPE_SKILL_STATS;
+  s32 outline_index = -1;
+  bool outline_changed = false;
+
   if (launch_interface == Interface_BANK) {
-    menu_type = MENU_TYPE_BANK;
+    menu_type = MENU_TYPE_WITHDRAW;
     launch_interface = Interface_UNKNOWN_INTERFACE;
+    outline_index = 0;
+    outline_changed = true;
   }
 
   bool menu_type_changed = true;
@@ -372,8 +410,41 @@ void show_menu() {
   while(1) {
     key_poll();
 
-    if (menu_type == MENU_TYPE_BANK) {
-      // TODO: Implement key handling for Bank UI
+    if (menu_type == MENU_TYPE_WITHDRAW) {
+      if (key_hit(KEY_R)) {
+        menu_type = MENU_TYPE_DEPOSIT;
+        menu_type_changed = true;
+        outline_index = 0;
+        outline_changed = true;
+      } else if (key_hit(KEY_LEFT)) {
+        if (outline_index > 0) {
+          outline_index -= 2;
+          outline_changed = true;
+        }
+      } else if (key_hit(KEY_RIGHT)) {
+        if (outline_index < INVENTORY_SIZE-3) {
+          outline_index += 2;
+          outline_changed = true;
+        }
+      }
+    } else if (menu_type == MENU_TYPE_DEPOSIT) {
+      if (key_hit(KEY_L)) {
+        menu_type = MENU_TYPE_WITHDRAW;
+        menu_type_changed = true;
+
+        outline_index = 0;
+        outline_changed = true;
+      } else if (key_hit(KEY_LEFT)) {
+        if (outline_index > 0) {
+          outline_index--;
+          outline_changed = true;
+        }
+      } else if (key_hit(KEY_RIGHT)) {
+        if (outline_index < INVENTORY_SIZE-1) {
+          outline_index++;
+          outline_changed = true;
+        }
+      }
     } else {
       if (key_hit(KEY_L)) {
         menu_type = MENU_TYPE_SKILL_STATS;
@@ -408,14 +479,33 @@ void show_menu() {
 
         update_inventory(menu_sprite);
         break;
-      case MENU_TYPE_BANK:
+      case MENU_TYPE_WITHDRAW:
         if (menu_type_changed) {
           menu_type_changed = false;
           oam_init(menu_sprite, 128);
           tte_erase_screen();
-          show_bank(menu_sprite);
+          show_bank_withdraw();
         }
+
+        update_bank_withdraw(menu_sprite);
         break;
+      case MENU_TYPE_DEPOSIT:
+        if (menu_type_changed) {
+          menu_type_changed = false;
+          oam_init(menu_sprite, 128);
+          tte_erase_screen();
+          show_bank_deposit();
+        }
+
+        update_bank_deposit(menu_sprite);
+        break;
+    }
+
+    if (outline_index != -1 && outline_changed) {
+      outline_changed = false;
+      u32 outline_x = 12 + (outline_index % COLUMN_COUNT) * 36;
+      u32 outline_y = 32 + (outline_index / COLUMN_COUNT) * 40;
+      show_outline_sprite(menu_sprite, outline_x, outline_y);
     }
 
     VBlankIntrWait();
