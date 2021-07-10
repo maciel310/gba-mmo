@@ -64,21 +64,21 @@ export default class LumberjackNpc extends Npc {
              ConversationStates.FIRST_WELCOME_NO_SPACE) &&
         !player.hasInventoryRoom()) {
       currentState.nextMessage = ConversationStates.FIRST_WELCOME_NO_SPACE;
-    } else if (
-        !player.inventory.includes(Item.values.HATCHET) &&
-        player.hasInventoryRoom()) {
-      // TODO: Also check bank for hatchet once implemented
+    } else if (!this._playerHasHatchet(player) && player.hasInventoryRoom()) {
       // TODO: Instead of giving another for free sell it instead.
       currentState.nextMessage = ConversationStates.MISSING_HATCHET;
       player.addItem(Item.values.HATCHET);
-    } else if (
-        !player.inventory.includes(Item.values.HATCHET) &&
-        !player.hasInventoryRoom()) {
+    } else if (!this._playerHasHatchet(player) && !player.hasInventoryRoom()) {
       currentState.nextMessage = ConversationStates.MISSING_HATCHET_NO_SPACE;
     } else {
       currentState.nextMessage = ConversationStates.GENERAL_WELCOME;
     }
 
     player.updateNpcState(NPC_TYPE, currentState);
+  }
+
+  _playerHasHatchet(player) {
+    return player.inventory.includes(Item.values.HATCHET) ||
+        player.bank[Item.values.HATCHET] > 0;
   }
 }
