@@ -2,6 +2,7 @@ import Chest from './chest.mjs';
 import LumberjackNpc from './npcs/lumberjack.mjs';
 import MayorNpc from './npcs/mayor.mjs';
 import {MapLocation} from './proto.mjs';
+import {Item, Skill} from './proto.mjs';
 import Resource from './resource.mjs';
 
 class WorldObjectTracker {
@@ -41,9 +42,39 @@ class WorldObjectTracker {
       {x: 31, y: 47},
     ];
     for (let tree of trees) {
-      this.addObject(
-          new Resource([96, 64], {x: tree.x * 8, y: tree.y * 8}, 100),
-          MapLocation.values.LUMBER_RIDGE);
+      const treeConfig = {
+        spriteIds: [96, 64],
+        position: {x: tree.x * 8, y: tree.y * 8},
+        regenTicks: 100,
+        skillType: Skill.values.WOODCUTTING,
+        itemType: Item.values.WOOD,
+        requiredItem: Item.values.HATCHET,
+      };
+      this.addObject(new Resource(treeConfig), MapLocation.values.LUMBER_RIDGE);
+    }
+
+    // Var Rock
+    const rocks = [
+      {x: 42, y: 29},
+      {x: 35, y: 33},
+      {x: 40, y: 37},
+      {x: 39, y: 44},
+      {x: 42, y: 49},
+      {x: 48, y: 50},
+      {x: 53, y: 46},
+      {x: 54, y: 39},
+      {x: 49, y: 33},
+    ];
+    for (let rock of rocks) {
+      const rockConfig = {
+        spriteIds: [192, 160],
+        position: {x: rock.x * 8, y: rock.y * 8},
+        regenTicks: 100,
+        skillType: Skill.values.MINING,
+        itemType: Item.values.ROCK,
+        requiredItem: Item.values.PICKAXE,
+      };
+      this.addObject(new Resource(rockConfig), MapLocation.values.VAR_ROCK);
     }
   }
 

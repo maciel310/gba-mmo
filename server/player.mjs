@@ -19,7 +19,7 @@ export default class Player {
   interface = undefined;
 
   skillExperience = {};
-  hasSkillUpdate = false;
+  hasSkillUpdate = true;
   hasPositionUpdate = false;
 
   inventory = [];
