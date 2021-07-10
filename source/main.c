@@ -79,6 +79,9 @@ s32 bank[_Item_ARRAYSIZE] = {0, 0, 0, 0, 0};
 
 u32 interaction_world_object_id = 0;
 
+s32 deposit_inventory_index = -1;
+Item withdraw_bank_item_type = Item_UNKNOWN_ITEM;
+
 Skill active_skill = Skill_UNKNOWN_SKILL;
 bool new_active_skill = false;
 
@@ -164,6 +167,18 @@ void send_status() {
     player_status.interaction_object_id = interaction_world_object_id;
     player_status.has_interaction_object_id = true;
     interaction_world_object_id = 0;
+  }
+
+  if (deposit_inventory_index != -1) {
+    player_status.deposit_inventory_index = deposit_inventory_index;
+    player_status.has_deposit_inventory_index = true;
+    deposit_inventory_index = -1;
+  }
+
+  if (withdraw_bank_item_type != Item_UNKNOWN_ITEM) {
+    player_status.withdraw_bank_item = withdraw_bank_item_type;
+    player_status.has_withdraw_bank_item = true;
+    withdraw_bank_item_type = Item_UNKNOWN_ITEM;
   }
 
   send_player_status(&player_status);
@@ -421,8 +436,11 @@ void show_menu() {
   }
 
   bool menu_type_changed = true;
+  bool should_send_status;
 
   while(1) {
+    should_send_status = false;
+
     key_poll();
 
     if (menu_type == MENU_TYPE_WITHDRAW) {
@@ -441,6 +459,12 @@ void show_menu() {
           outline_index += 2;
           outline_changed = true;
         }
+      } else if (key_hit(KEY_A)) {
+        Item item = (Item) (outline_index / 2 + 1);
+        if (bank[item] > 0) {
+          withdraw_bank_item_type = item;
+          should_send_status = true;
+        }
       }
     } else if (menu_type == MENU_TYPE_DEPOSIT) {
       if (key_hit(KEY_L)) {
@@ -458,6 +482,11 @@ void show_menu() {
         if (outline_index < INVENTORY_SIZE-1) {
           outline_index++;
           outline_changed = true;
+        }
+      } else if (key_hit(KEY_A)) {
+        if (p.inventory[outline_index] != Item_UNKNOWN_ITEM) {
+          deposit_inventory_index = outline_index;
+          should_send_status = true;
         }
       }
     } else {
@@ -521,6 +550,10 @@ void show_menu() {
       u32 outline_x = 12 + (outline_index % COLUMN_COUNT) * 36;
       u32 outline_y = 32 + (outline_index / COLUMN_COUNT) * 40;
       show_outline_sprite(menu_sprite, outline_x, outline_y);
+    }
+
+    if (should_send_status) {
+      send_status();
     }
 
     VBlankIntrWait();

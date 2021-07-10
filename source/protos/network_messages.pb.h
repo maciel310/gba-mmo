@@ -61,6 +61,11 @@ typedef struct _PlayerStatus {
     Direction direction; 
     bool has_interaction_object_id;
     int32_t interaction_object_id; 
+    /* Bank operations. */
+    bool has_deposit_inventory_index;
+    int32_t deposit_inventory_index; 
+    bool has_withdraw_bank_item;
+    Item withdraw_bank_item; 
 } PlayerStatus;
 
 typedef struct _SkillStats { 
@@ -122,11 +127,11 @@ extern "C" {
 
 /* Initializer values for message structs */
 #define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}}
-#define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
+#define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0, false, 0, false, _Item_MIN}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
 #define BankEntry_init_default                   {false, _Item_MIN, false, 0}
 #define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}}
-#define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
+#define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0, false, 0, false, _Item_MIN}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 #define BankEntry_init_zero                      {false, _Item_MIN, false, 0}
 
@@ -137,6 +142,8 @@ extern "C" {
 #define PlayerStatus_y_tag                       2
 #define PlayerStatus_direction_tag               3
 #define PlayerStatus_interaction_object_id_tag   4
+#define PlayerStatus_deposit_inventory_index_tag 5
+#define PlayerStatus_withdraw_bank_item_tag      6
 #define SkillStats_skill_tag                     1
 #define SkillStats_level_tag                     2
 #define SkillStats_exp_tag                       3
@@ -172,7 +179,9 @@ X(a, CALLBACK, REPEATED, MESSAGE,  bank,              9)
 X(a, STATIC,   OPTIONAL, INT32,    x,                 1) \
 X(a, STATIC,   OPTIONAL, INT32,    y,                 2) \
 X(a, STATIC,   OPTIONAL, UENUM,    direction,         3) \
-X(a, STATIC,   OPTIONAL, INT32,    interaction_object_id,   4)
+X(a, STATIC,   OPTIONAL, INT32,    interaction_object_id,   4) \
+X(a, STATIC,   OPTIONAL, INT32,    deposit_inventory_index,   5) \
+X(a, STATIC,   OPTIONAL, UENUM,    withdraw_bank_item,   6)
 #define PlayerStatus_CALLBACK NULL
 #define PlayerStatus_DEFAULT NULL
 
@@ -203,7 +212,7 @@ extern const pb_msgdesc_t BankEntry_msg;
 /* Maximum encoded size of messages (where known) */
 /* ServerUpdate_size depends on runtime parameters */
 #define BankEntry_size                           13
-#define PlayerStatus_size                        35
+#define PlayerStatus_size                        48
 #define SkillStats_size                          24
 
 #ifdef __cplusplus
