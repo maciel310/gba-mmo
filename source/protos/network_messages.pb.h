@@ -33,7 +33,10 @@ typedef enum _Skill {
 
 typedef enum _Item { 
     Item_UNKNOWN_ITEM = 0, 
-    Item_WOOD = 1 
+    Item_WOOD = 1, 
+    Item_ROCK = 2, 
+    Item_HATCHET = 3, 
+    Item_PICKAXE = 4 
 } Item;
 
 /* Struct definitions */
@@ -69,8 +72,9 @@ typedef struct _ServerUpdate {
     Skill interacting_skill; 
     bool has_current_map;
     MapLocation current_map; 
+    /* NOTE: If max_count is updated change in server and ROM. */
     pb_size_t inventory_count;
-    Item inventory[24]; 
+    Item inventory[18]; 
 } ServerUpdate;
 
 
@@ -88,8 +92,8 @@ typedef struct _ServerUpdate {
 #define _Skill_ARRAYSIZE ((Skill)(Skill_WOODCUTTING+1))
 
 #define _Item_MIN Item_UNKNOWN_ITEM
-#define _Item_MAX Item_WOOD
-#define _Item_ARRAYSIZE ((Item)(Item_WOOD+1))
+#define _Item_MAX Item_PICKAXE
+#define _Item_ARRAYSIZE ((Item)(Item_PICKAXE+1))
 
 
 #ifdef __cplusplus
@@ -97,10 +101,10 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 

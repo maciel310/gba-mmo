@@ -42,12 +42,18 @@ void initialize_sprites() {
 u8 itemSpriteLut[_Item_ARRAYSIZE] = {
   0, // UNKNOWN_ITEM
   0, // WOOD
+  32, // ROCK
+  64, // HATCHET
+  96, // PICKAXE
 };
 
 void initialize_menu_sprites() {
   dma3_cpy(pal_obj_mem, menu_spritesSharedPal, menu_spritesSharedPalLen);
 
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_WOOD]], woodTiles, woodTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_ROCK]], rockTiles, rockTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_HATCHET]], hatchetTiles, hatchetTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_PICKAXE]], pickaxeTiles, pickaxeTilesLen);
 }
 
 // NOTE: If updated change in proto and server code.
