@@ -19,6 +19,8 @@ message ServerUpdate {
 
   // NOTE: If max_count is updated change in server and ROM.
   repeated Item inventory = 7 [(nanopb).max_count = 18];
+
+  optional Interface launch_interface = 8;
 }
 
 enum Direction {
@@ -60,4 +62,9 @@ enum Item {
   ROCK = 2;
   HATCHET = 3;
   PICKAXE = 4;
+}
+
+enum Interface {
+  UNKNOWN_INTERFACE = 0;
+  BANK = 1;
 }
