@@ -22,6 +22,7 @@ export default class Player {
   hasPositionUpdate = false;
 
   inventory = [];
+  bank = {};
 
   resourceInteraction = undefined;
 
@@ -44,6 +45,7 @@ export default class Player {
     p.playerToken = playerToken;
     p.inventory = playerObject.inventory;
     Object.assign(p.npcState, playerObject.npcState);
+    Object.assign(p.bank, playerObject.bank);
 
     return p;
   }
@@ -142,8 +144,8 @@ export default class Player {
     this.savePlayerStatus({skillExp: this.skillExperience});
   }
 
-  hasInventoryRoom() {
-    return this.inventory.length < MAX_INVENTORY_SIZE;
+  hasInventoryRoom(count = 1) {
+    return this.inventory.length + count <= MAX_INVENTORY_SIZE;
   }
 
   addItem(item) {
@@ -153,6 +155,37 @@ export default class Player {
 
     this.inventory.push(item);
     this.savePlayerStatus({inventory: this.inventory});
+  }
+
+  bankInventoryItem(index) {
+    if (this.inventory[index] == undefined) {
+      return;
+    }
+
+    const [item] = this.inventory.splice(index, 1);
+    if (this.bank.hasOwnProperty(item)) {
+      this.bank[item]++;
+    } else {
+      this.bank[item] = 1;
+    }
+
+    this.savePlayerStatus({bank: this.bank, inventory: this.inventory});
+  }
+
+  withdrawBankItems(type, count) {
+    if (!this.hasInventoryRoom(count)) {
+      return;
+    }
+    if (!this.bank.hasOwnProperty(type) || this.bank[type] < count) {
+      return;
+    }
+
+    this.bank[type] -= count;
+    for (let i = 0; i < count; i++) {
+      this.inventory.push(type);
+    }
+
+    this.savePlayerStatus({bank: this.bank, inventory: this.inventory});
   }
 
   updateNpcState(npc, state) {
