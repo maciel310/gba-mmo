@@ -23,9 +23,26 @@ class WorldObjectTracker {
   }
 
   spawnResources() {
-    for (let y = 128; y <= 384; y += 32) {
+    // Lumber Ridge
+    const trees = [
+      {x: 25, y: 20},
+      {x: 29, y: 33},
+      {x: 19, y: 36},
+      {x: 36, y: 37},
+      {x: 29, y: 40},
+      {x: 46, y: 37},
+      {x: 53, y: 34},
+      {x: 53, y: 41},
+      {x: 41, y: 43},
+      {x: 51, y: 48},
+      {x: 52, y: 57},
+      {x: 44, y: 50},
+      {x: 37, y: 50},
+      {x: 31, y: 47},
+    ];
+    for (let tree of trees) {
       this.addObject(
-          new Resource([96, 64], {x: 256, y}, 100),
+          new Resource([96, 64], {x: tree.x * 8, y: tree.y * 8}, 100),
           MapLocation.values.LUMBER_RIDGE);
     }
   }

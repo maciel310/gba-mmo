@@ -62,17 +62,17 @@ teleporters.set(MapLocation.values.TOWN, [
       200, 224),
   new Teleporter(
       432, 344, 32, 32, MapLocation.values.TOWN,
-      MapLocation.values.LUMBER_RIDGE, 200, 224),
-]);
-teleporters.set(MapLocation.values.LUMBER_RIDGE, [
-  new Teleporter(
-      144, 224, 32, 32, MapLocation.values.LUMBER_RIDGE,
-      MapLocation.values.TOWN, 392, 336),
+      MapLocation.values.LUMBER_RIDGE, 224, 224),
 ]);
 teleporters.set(MapLocation.values.VAR_ROCK, [
   new Teleporter(
       144, 224, 32, 32, MapLocation.values.VAR_ROCK, MapLocation.values.TOWN,
       392, 232),
+]);
+teleporters.set(MapLocation.values.LUMBER_RIDGE, [
+  new Teleporter(
+      168, 224, 32, 32, MapLocation.values.LUMBER_RIDGE,
+      MapLocation.values.TOWN, 392, 336),
 ]);
 
 
