@@ -135,8 +135,12 @@ export default class Player {
     this.savePlayerStatus({skillExp: this.skillExperience});
   }
 
+  hasInventoryRoom() {
+    return this.inventory.length < MAX_INVENTORY_SIZE;
+  }
+
   addItem(item) {
-    if (this.inventory.length >= MAX_INVENTORY_SIZE) {
+    if (!this.hasInventoryRoom()) {
       return;
     }
 
