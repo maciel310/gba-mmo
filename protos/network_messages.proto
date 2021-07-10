@@ -21,6 +21,9 @@ message ServerUpdate {
   repeated Item inventory = 7 [(nanopb).max_count = 18];
 
   optional Interface launch_interface = 8;
+
+  // Key is the Item enum numeric value, value is the quantity of that item.
+  repeated BankEntry bank = 9;
 }
 
 enum Direction {
@@ -67,4 +70,9 @@ enum Item {
 enum Interface {
   UNKNOWN_INTERFACE = 0;
   BANK = 1;
+}
+
+message BankEntry {
+  optional Item item = 1;
+  optional int32 quantity = 2;
 }
