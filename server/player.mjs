@@ -16,6 +16,7 @@ export default class Player {
   direction = Direction.UP;
 
   message = '';
+  interface = undefined;
 
   skillExperience = {};
   hasSkillUpdate = false;

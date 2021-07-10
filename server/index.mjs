@@ -97,6 +97,10 @@ setInterval(() => {
       updateObject.networkMessage = player.message;
       player.message = '';
     }
+    if (player.interface != undefined) {
+      updateObject.launchInterface = player.interface;
+      player.interface = undefined;
+    }
     if (player.hasSkillUpdate) {
       updateObject.skillStats = player.getSkillStats();
       player.hasSkillUpdate = false;

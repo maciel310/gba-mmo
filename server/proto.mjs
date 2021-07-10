@@ -12,6 +12,7 @@ const SpriteSize = root.lookupEnum('SpriteSize');
 const Skill = root.lookupEnum('Skill');
 const MapLocation = root.lookupEnum('MapLocation');
 const Item = root.lookupEnum('Item');
+const Interface = root.lookupEnum('Interface');
 
 export {
   ServerUpdate,
@@ -22,4 +23,5 @@ export {
   Skill,
   MapLocation,
   Item,
+  Interface,
 };

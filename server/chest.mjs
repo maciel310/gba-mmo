@@ -1,4 +1,4 @@
-import {SpriteSize} from './proto.mjs';
+import {Interface, SpriteSize} from './proto.mjs';
 import WorldObject from './world_object.mjs';
 
 export default class Chest extends WorldObject {
@@ -10,7 +10,7 @@ export default class Chest extends WorldObject {
   }
 
   interact(player) {
-    return 'You open the chest...';
+    player.interface = Interface.values.BANK;
   }
 
   toWorldObject() {
