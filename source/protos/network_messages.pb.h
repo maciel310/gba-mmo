@@ -28,7 +28,8 @@ typedef enum _MapLocation {
 
 typedef enum _Skill { 
     Skill_UNKNOWN_SKILL = 0, 
-    Skill_WOODCUTTING = 1 
+    Skill_WOODCUTTING = 1, 
+    Skill_MINING = 2 
 } Skill;
 
 typedef enum _Item { 
@@ -109,8 +110,8 @@ typedef struct _ServerUpdate {
 #define _MapLocation_ARRAYSIZE ((MapLocation)(MapLocation_TOWN+1))
 
 #define _Skill_MIN Skill_UNKNOWN_SKILL
-#define _Skill_MAX Skill_WOODCUTTING
-#define _Skill_ARRAYSIZE ((Skill)(Skill_WOODCUTTING+1))
+#define _Skill_MAX Skill_MINING
+#define _Skill_ARRAYSIZE ((Skill)(Skill_MINING+1))
 
 #define _Item_MIN Item_UNKNOWN_ITEM
 #define _Item_MAX Item_PICKAXE

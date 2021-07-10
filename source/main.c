@@ -21,9 +21,10 @@ OBJ_ATTR sprite[128];
 s32 worldX = 0;
 s32 worldY = 0;
 
-u8 skillSpriteLut[2] = {
+u8 skillSpriteLut[_Skill_ARRAYSIZE] = {
   0, // Skill_UNKNOWN_SKILL
-  160, // Skill_WOODCUTTING
+  224, // Skill_WOODCUTTING
+  232, // Skill_MINING
 };
 
 void initialize_sprites() {
@@ -35,8 +36,11 @@ void initialize_sprites() {
   dma3_cpy(&tile_mem[4][64], tree1Tiles, tree1TilesLen);
   dma3_cpy(&tile_mem[4][96], tree2Tiles, tree2TilesLen);
   dma3_cpy(&tile_mem[4][128], chestTiles, chestTilesLen);
+  dma3_cpy(&tile_mem[4][160], rock1Tiles, rock1TilesLen);
+  dma3_cpy(&tile_mem[4][192], rock2Tiles, rock2TilesLen);
 
   dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_WOODCUTTING]], axeTiles, axeTilesLen);
+  dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_MINING]], pickTiles, pickTilesLen);
 }
 
 u8 itemSpriteLut[_Item_ARRAYSIZE] = {
@@ -73,7 +77,7 @@ typedef struct {
 } Player;
 Player p;
 
-s32 skill_levels[_Skill_ARRAYSIZE] = {1, 1};
+s32 skill_levels[_Skill_ARRAYSIZE] = {-1, -1, -1};
 
 s32 bank[_Item_ARRAYSIZE] = {0, 0, 0, 0, 0};
 
@@ -129,7 +133,7 @@ void update_player_sprite_entry() {
 
   if (active_skill != Skill_UNKNOWN_SKILL) {
     obj_unhide(&sprite[1], ATTR0_MODE(0));
-    obj_set_attr(&sprite[1], ATTR0_8BPP | ATTR0_SQUARE | ATTR0_REG, ATTR1_SIZE_16x16, ATTR2_PALBANK(0) | ATTR2_ID(skillSpriteLut[Skill_WOODCUTTING]));
+    obj_set_attr(&sprite[1], ATTR0_8BPP | ATTR0_SQUARE | ATTR0_REG, ATTR1_SIZE_16x16, ATTR2_PALBANK(0) | ATTR2_ID(skillSpriteLut[active_skill]));
     obj_set_pos(&sprite[1], PLAYER_SCREEN_X, PLAYER_SCREEN_Y - 16);
   } else {
     obj_hide(&sprite[1]);
@@ -207,7 +211,9 @@ void show_skill_update(SkillStats s) {
     return;
   }
 
-  if (skill_levels[s.skill] != s.level) {
+  if (skill_levels[s.skill] == -1) {
+    skill_levels[s.skill] = s.level;
+  } else if (skill_levels[s.skill] != s.level) {
     skill_levels[s.skill] = s.level;
     char msg[90];
     sprintf(msg, "You've gained a level! You're now at %ld", s.level);
@@ -317,6 +323,9 @@ void show_skill_stats() {
   char buffer[8];
   sprintf(buffer, "Level %d", skill_levels[Skill_WOODCUTTING]);
   tte_write_ex(50, 50, buffer, NULL);
+
+  sprintf(buffer, "Level %d", skill_levels[Skill_MINING]);
+  tte_write_ex(50, 100, buffer, NULL);
 }
 
 void show_inventory_sprite(OBJ_ATTR* menu_sprite, u32 i, u32 row, u32 col, Item item) {
