@@ -1,6 +1,6 @@
 import {randomBytes} from 'crypto'
 
-import {Direction, MapLocation, Skill} from './proto.mjs';
+import {Direction, Item, MapLocation, Skill} from './proto.mjs';
 import {getPlayer, setPlayer} from './storage.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
@@ -110,8 +110,15 @@ export default class Player {
     if (playerStatus.interactionObjectId) {
       const o = worldObjectTracker.getObject(playerStatus.interactionObjectId);
       if (o.canInteract()) {
-        if (o.isSkillResource() && this.inventory.length < MAX_INVENTORY_SIZE) {
-          this.resourceInteraction = o;
+        if (o.isSkillResource()) {
+          if (!this.inventory.includes(o.requiredItem)) {
+            this.message =
+                `You need a ${Item.valuesById[o.requiredItem]} to do that!`;
+          } else if (!this.hasInventoryRoom()) {
+            this.message = 'Your bag is already full!';
+          } else {
+            this.resourceInteraction = o;
+          }
         } else {
           this.message = o.interact(this);
         }

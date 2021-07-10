@@ -13,6 +13,7 @@ export default class Resource extends WorldObject {
   successChancePercentage = 0.05;
   skillType = Skill.values.WOODCUTTING;
   itemType = Item.values.WOOD;
+  requiredItem = Item.values.HATCHET;
 
   constructor(spriteIds, position, regenTicks) {
     super();
