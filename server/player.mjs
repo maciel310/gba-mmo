@@ -94,6 +94,10 @@ export default class Player {
     this.maybeSaveChanges();
   }
 
+  logout() {
+    worldObjectTracker.removeObject(this.worldObject.objectId);
+  }
+
   handleResourceInteraction() {
     if (this.resourceInteraction != undefined) {
       if (this.inventory.length >= MAX_INVENTORY_SIZE) {

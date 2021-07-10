@@ -11,6 +11,8 @@ class WorldObjectTracker {
   // Map of ObjectId to Object
   objectMap = new Map();
 
+  availableIds = [];
+
   constructor() {
     this.spawnPermanentNpcs();
     this.spawnResources();
@@ -78,15 +80,27 @@ class WorldObjectTracker {
     }
   }
 
+  getNextId() {
+    if (this.availableIds.length > 0) {
+      return this.availableIds.shift();
+    }
+    return this.nextObjectId++;
+  }
+
   addObject(o, map) {
-    this.objectMap.set(this.nextObjectId, o);
-    o.setObjectId(this.nextObjectId);
+    const id = this.getNextId();
+    this.objectMap.set(id, o);
+    o.setObjectId(id);
     o.setMap(map);
-    this.nextObjectId++;
   }
 
   getObject(id) {
     return this.objectMap.get(id);
+  }
+
+  removeObject(id) {
+    this.objectMap.delete(id);
+    this.availableIds.push(id);
   }
 
   tick() {

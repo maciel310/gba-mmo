@@ -31,6 +31,13 @@ server.on('message', async (message, clientInfo) => {
 
       server.send('success', clientInfo.port, clientInfo.address);
 
+      // Remove any other instances of that player from the client list.
+      for (const [clientKey, client] of clientList) {
+        if (client.player.playerToken == playerToken) {
+          removePlayer(clientKey);
+        }
+      }
+
       clientList.set(clientKey, {
         'address': clientInfo.address,
         'port': clientInfo.port,
@@ -75,12 +82,18 @@ teleporters.set(MapLocation.values.LUMBER_RIDGE, [
       MapLocation.values.TOWN, 392, 336),
 ]);
 
+// Log users out after 1 minute of no received messages.
+const LOGOUT_LIMIT_MS = 1 * 60 * 1000;
 
 setInterval(() => {
   worldObjectTracker.tick();
   const worldObjects = worldObjectTracker.getWorldObjects();
 
-  for (const clientInfo of clientList.values()) {
+  for (const [clientKey, clientInfo] of clientList) {
+    if ((new Date() - clientInfo.lastSeen) > LOGOUT_LIMIT_MS) {
+      removePlayer(clientKey);
+    }
+
     const player = clientInfo.player;
     player.tick();
 
@@ -133,3 +146,8 @@ setInterval(() => {
 }, TICK_INTERVAL_MS);
 
 server.bind(5465);
+
+function removePlayer(clientKey) {
+  clientList.get(clientKey).player.logout();
+  clientList.delete(clientKey);
+}
