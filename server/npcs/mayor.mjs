@@ -29,7 +29,7 @@ export default class MayorNpc extends Npc {
   interact(player) {
     this.updateConversationState(player);
 
-    switch (player.npcState['MAYOR'].conversation) {
+    switch (player.npcState[NPC_TYPE].conversation) {
       case ConversationStates.FIRST_WELCOME_1:
         return 'Welcome! Take a look around the town. There\'s a bank chest to the west,';
       case ConversationStates.FIRST_WELCOME_2:
