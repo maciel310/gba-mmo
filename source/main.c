@@ -350,6 +350,21 @@ void show_bank_withdraw() {
 }
 
 void update_bank_withdraw(OBJ_ATTR* menu_sprite) {
+  tte_erase_screen();
+
+  char qty_buffer[3];
+  for (u32 itemIndex = _Item_MIN+1; itemIndex <= _Item_MAX; itemIndex++) {
+    u32 row = (itemIndex-1) / (COLUMN_COUNT / 2);
+    u32 col = ((itemIndex-1) % (COLUMN_COUNT / 2)) * 2;
+
+    if (bank[itemIndex] != 0) {
+      show_inventory_sprite(menu_sprite, itemIndex, row, col, itemIndex);
+      sprintf(qty_buffer, "%d", bank[itemIndex]);
+      tte_write_ex(48 + col * 36, 48 + row * 40, qty_buffer, NULL);
+    } else {
+      obj_hide(&menu_sprite[itemIndex]);
+    }
+  }
 }
 
 void show_bank_deposit() {
