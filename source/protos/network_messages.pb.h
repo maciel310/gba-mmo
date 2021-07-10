@@ -45,6 +45,13 @@ typedef enum _Interface {
 } Interface;
 
 /* Struct definitions */
+typedef struct _BankEntry { 
+    bool has_item;
+    Item item; 
+    bool has_quantity;
+    int32_t quantity; 
+} BankEntry;
+
 typedef struct _PlayerStatus { 
     bool has_x;
     int32_t x; 
@@ -82,6 +89,8 @@ typedef struct _ServerUpdate {
     Item inventory[18]; 
     bool has_launch_interface;
     Interface launch_interface; 
+    /* Key is the Item enum numeric value, value is the quantity of that item. */
+    pb_callback_t bank; 
 } ServerUpdate;
 
 
@@ -112,14 +121,18 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN}
+#define BankEntry_init_default                   {false, _Item_MIN, false, 0}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
+#define BankEntry_init_zero                      {false, _Item_MIN, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
+#define BankEntry_item_tag                       1
+#define BankEntry_quantity_tag                   2
 #define PlayerStatus_x_tag                       1
 #define PlayerStatus_y_tag                       2
 #define PlayerStatus_direction_tag               3
@@ -135,6 +148,7 @@ extern "C" {
 #define ServerUpdate_current_map_tag             6
 #define ServerUpdate_inventory_tag               7
 #define ServerUpdate_launch_interface_tag        8
+#define ServerUpdate_bank_tag                    9
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -145,12 +159,14 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  player_status,     4) \
 X(a, STATIC,   OPTIONAL, UENUM,    interacting_skill,   5) \
 X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6) \
 X(a, STATIC,   REPEATED, UENUM,    inventory,         7) \
-X(a, STATIC,   OPTIONAL, UENUM,    launch_interface,   8)
+X(a, STATIC,   OPTIONAL, UENUM,    launch_interface,   8) \
+X(a, CALLBACK, REPEATED, MESSAGE,  bank,              9)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject
 #define ServerUpdate_skill_stats_MSGTYPE SkillStats
 #define ServerUpdate_player_status_MSGTYPE PlayerStatus
+#define ServerUpdate_bank_MSGTYPE BankEntry
 
 #define PlayerStatus_FIELDLIST(X, a) \
 X(a, STATIC,   OPTIONAL, INT32,    x,                 1) \
@@ -167,17 +183,26 @@ X(a, STATIC,   OPTIONAL, INT32,    exp,               3)
 #define SkillStats_CALLBACK NULL
 #define SkillStats_DEFAULT NULL
 
+#define BankEntry_FIELDLIST(X, a) \
+X(a, STATIC,   OPTIONAL, UENUM,    item,              1) \
+X(a, STATIC,   OPTIONAL, INT32,    quantity,          2)
+#define BankEntry_CALLBACK NULL
+#define BankEntry_DEFAULT NULL
+
 extern const pb_msgdesc_t ServerUpdate_msg;
 extern const pb_msgdesc_t PlayerStatus_msg;
 extern const pb_msgdesc_t SkillStats_msg;
+extern const pb_msgdesc_t BankEntry_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define ServerUpdate_fields &ServerUpdate_msg
 #define PlayerStatus_fields &PlayerStatus_msg
 #define SkillStats_fields &SkillStats_msg
+#define BankEntry_fields &BankEntry_msg
 
 /* Maximum encoded size of messages (where known) */
 /* ServerUpdate_size depends on runtime parameters */
+#define BankEntry_size                           13
 #define PlayerStatus_size                        35
 #define SkillStats_size                          24
 

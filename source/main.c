@@ -71,6 +71,8 @@ Player p;
 
 s32 skill_levels[_Skill_ARRAYSIZE] = {1, 1};
 
+s32 bank[_Item_ARRAYSIZE] = {0, 0, 0, 0, 0};
+
 u32 interaction_world_object_id = 0;
 
 Skill active_skill = Skill_UNKNOWN_SKILL;
@@ -200,6 +202,10 @@ void update_server_player_position(PlayerStatus s) {
   p.y = p.dest_y = s.y;
 }
 
+void update_bank(BankEntry b) {
+  bank[b.item] = b.quantity;
+}
+
 void update_state_with_server_update(ServerUpdate s) {
   first_server_update_received = true;
 
@@ -322,6 +328,16 @@ void update_inventory(OBJ_ATTR* menu_sprite) {
 void show_bank(OBJ_ATTR* menu_sprite) {
   load_assets_bank();
 
+
+  char buffer[30];
+  sprintf(buffer, "Wood %d", bank[Item_WOOD]);
+  tte_write_ex(50, 50, buffer, NULL);
+  sprintf(buffer, "Rock %d", bank[Item_ROCK]);
+  tte_write_ex(50, 60, buffer, NULL);
+  sprintf(buffer, "Hatchet %d", bank[Item_HATCHET]);
+  tte_write_ex(50, 70, buffer, NULL);
+  sprintf(buffer, "Pickaxe %d", bank[Item_PICKAXE]);
+  tte_write_ex(50, 80, buffer, NULL);
 }
 
 typedef enum _menu_type { 
@@ -425,7 +441,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(update_state_with_server_update, show_skill_update, world_object_received);
+  serial_init(update_state_with_server_update, show_skill_update, world_object_received, update_bank);
   text_init();
 
   load_assets_connecting();

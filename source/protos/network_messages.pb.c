@@ -15,6 +15,9 @@ PB_BIND(PlayerStatus, PlayerStatus, AUTO)
 PB_BIND(SkillStats, SkillStats, AUTO)
 
 
+PB_BIND(BankEntry, BankEntry, AUTO)
+
+
 
 
 

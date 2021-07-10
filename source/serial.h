@@ -10,7 +10,8 @@
 void serial_init(
     void (*server_update_callback)(ServerUpdate),
     void (*skill_stats_callback)(SkillStats),
-    void (*world_object_callback)(WorldObject));
+    void (*world_object_callback)(WorldObject),
+    void (*bank_update_callback)(BankEntry));
 bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg);
 void handle_serial();
 void send_player_status(PlayerStatus* p);

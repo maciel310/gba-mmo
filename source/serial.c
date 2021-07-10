@@ -3,11 +3,13 @@
 void (*handle_server_update)(ServerUpdate);
 void (*handle_skill_stats)(SkillStats);
 void (*handle_world_object)(WorldObject);
+void (*handle_bank_update)(BankEntry);
 
 void serial_init(
     void (*server_update_callback)(ServerUpdate),
     void (*skill_stats_callback)(SkillStats),
-    void (*world_object_callback)(WorldObject)) {
+    void (*world_object_callback)(WorldObject),
+    void (*bank_update_callback)(BankEntry)) {
   REG_RCNT = 0;
   REG_SIODATA32 = 0;
   REG_SIOCNT = SION_CLK_EXT | SION_ENABLE | SIO_MODE_32BIT | SIO_IRQ;
@@ -15,6 +17,7 @@ void serial_init(
   handle_server_update = server_update_callback;
   handle_skill_stats = skill_stats_callback;
   handle_world_object = world_object_callback;
+  handle_bank_update = bank_update_callback;
 
   irq_add(II_SERIAL, handle_serial);
 }
@@ -34,6 +37,14 @@ bool decode_skill_stats(pb_istream_t *stream, const pb_field_t *field, void **ar
 
   return true;
 }
+
+bool decode_bank_entry(pb_istream_t *stream, const pb_field_t *field, void **arg) {
+  BankEntry entry = BankEntry_init_zero;
+  pb_decode(stream, BankEntry_fields, &entry);
+  handle_bank_update(entry);
+
+  return true;
+};
 
 size_t outgoing_length = 0;
 size_t outgoing_position = 0;
@@ -78,6 +89,7 @@ void handle_serial() {
     pb_istream_t stream = pb_istream_from_buffer(buffer, expected_message_length - 4);
     message.world_object.funcs.decode = decode_world_object;
     message.skill_stats.funcs.decode = decode_skill_stats;
+    message.bank.funcs.decode = decode_bank_entry;
     pb_decode(&stream, ServerUpdate_fields, &message);
 
     handle_server_update(message);
