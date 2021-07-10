@@ -1,7 +1,7 @@
 import {createSocket} from 'dgram';
 
 import Player from './player.mjs';
-import {Item, MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
+import {Interface, MapLocation, PlayerStatus, ServerUpdate} from './proto.mjs';
 import Teleporter from './teleporter.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
@@ -99,6 +99,11 @@ setInterval(() => {
     }
     if (player.interface != undefined) {
       updateObject.launchInterface = player.interface;
+      switch (player.interface) {
+        case Interface.values.BANK:
+          updateObject.bank = player.encodeBank();
+          break;
+      }
       player.interface = undefined;
     }
     if (player.hasSkillUpdate) {

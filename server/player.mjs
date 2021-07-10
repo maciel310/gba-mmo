@@ -226,4 +226,15 @@ export default class Player {
   getPositionUpdate() {
     return {x: this.x, y: this.y};
   }
+
+  encodeBank() {
+    const encodedBank = [];
+    for (let key of Object.keys(this.bank)) {
+      encodedBank.push({
+        item: key,
+        quantity: this.bank[key],
+      });
+    }
+    return encodedBank;
+  }
 }
