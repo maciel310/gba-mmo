@@ -101,7 +101,7 @@ setInterval(() => {
       updateObject.launchInterface = player.interface;
       switch (player.interface) {
         case Interface.values.BANK:
-          updateObject.bank = player.encodeBank();
+          player.bankChanged = true;
           break;
       }
       player.interface = undefined;
@@ -116,6 +116,10 @@ setInterval(() => {
     }
     if (player.resourceInteraction != undefined) {
       updateObject.interactingSkill = player.resourceInteraction.skillType;
+    }
+    if (player.bankChanged) {
+      updateObject.bank = player.encodeBank();
+      player.bankChanged = false;
     }
 
     // TODO: Limit update size to 512 bytes per UDP message.

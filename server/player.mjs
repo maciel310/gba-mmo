@@ -1,6 +1,6 @@
 import {randomBytes} from 'crypto'
 
-import {Direction, Item, MapLocation, Skill} from './proto.mjs';
+import {Direction, Item, MapLocation, PlayerStatus, Skill} from './proto.mjs';
 import {getPlayer, setPlayer} from './storage.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
@@ -24,6 +24,7 @@ export default class Player {
 
   inventory = [];
   bank = {};
+  bankChanged = true;
 
   resourceInteraction = undefined;
 
@@ -99,6 +100,9 @@ export default class Player {
   }
 
   updateWithStatus(playerStatus) {
+    // Convert to plain JS object to distinguish between unset fields...
+    const playerStatusObject = PlayerStatus.toObject(playerStatus);
+
     if (!this.hasPositionUpdate) {
       if (this.x != playerStatus.x || this.y != playerStatus.y) {
         this.resourceInteraction = undefined;
@@ -126,6 +130,14 @@ export default class Player {
           this.message = o.interact(this);
         }
       }
+    }
+
+    if (playerStatusObject.depositInventoryIndex != undefined) {
+      this.bankInventoryItem(playerStatus.depositInventoryIndex);
+    }
+
+    if (playerStatusObject.withdrawBankItem != undefined) {
+      this.withdrawBankItems(playerStatus.withdrawBankItem, 1);
     }
   }
 
@@ -197,6 +209,10 @@ export default class Player {
 
   async maybeSaveChanges() {
     if (this.changes) {
+      if (this.changes.hasOwnProperty('bank')) {
+        this.bankChanged = true;
+      }
+
       const playerObject = await getPlayer(this.playerToken);
 
       Object.assign(playerObject, this.changes);
