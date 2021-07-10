@@ -1,7 +1,8 @@
 import {randomBytes} from 'crypto'
 
-import {Direction, Item, MapLocation, PlayerStatus, Skill} from './proto.mjs';
+import {Direction, Item, MapLocation, PlayerStatus, Skill, SpriteSize} from './proto.mjs';
 import {getPlayer, setPlayer} from './storage.mjs';
+import WorldObject from './world_object.mjs';
 import worldObjectTracker from './world_object_tracker.mjs';
 
 // NOTE: If updated change in proto and ROM file.
@@ -9,6 +10,7 @@ const MAX_INVENTORY_SIZE = 18;
 
 export default class Player {
   playerToken = '';
+  username = '';
 
   x = 0;
   y = 0;
@@ -32,6 +34,8 @@ export default class Player {
 
   npcState = {};
 
+  worldObject;
+
   static async load(playerToken) {
     const playerObject = await getPlayer(playerToken);
     if (!playerObject) {
@@ -39,6 +43,7 @@ export default class Player {
     }
 
     const p = new Player();
+    p.username = playerObject.username;
     p.skillExperience = playerObject.skillExp;
     p.x = playerObject.x;
     p.y = playerObject.y;
@@ -48,6 +53,10 @@ export default class Player {
     p.inventory = playerObject.inventory;
     Object.assign(p.npcState, playerObject.npcState);
     Object.assign(p.bank, playerObject.bank);
+
+    const playerWorldObject = new PlayerWorldObject(p);
+    p.worldObject = playerWorldObject;
+    worldObjectTracker.addObject(playerWorldObject, p.currentMap);
 
     return p;
   }
@@ -146,6 +155,8 @@ export default class Player {
     this.y = y;
     this.currentMap = map;
     this.hasPositionUpdate = true;
+
+    this.worldObject.setMap(map);
 
     this.savePlayerStatus({x: this.x, y: this.y, currentMap: this.currentMap});
   }
@@ -252,5 +263,56 @@ export default class Player {
       });
     }
     return encodedBank;
+  }
+}
+
+class PlayerWorldObject extends WorldObject {
+  player;
+  spriteId;
+
+  constructor(player) {
+    super();
+
+    this.player = player;
+  }
+
+  canInteract() {
+    return true;
+  }
+
+  interact(player) {
+    return `${this.player.username} says hello!`;
+  }
+
+  tick() {
+    switch (this.player.direction) {
+      case Direction.values.UP:
+        this.spriteId = 0;
+        break;
+      case Direction.values.DOWN:
+        this.spriteId = 16;
+        break;
+      case Direction.values.LEFT:
+        this.spriteId = 32;
+        break;
+      default:
+        this.spriteId = 48;
+        break;
+    }
+  }
+
+  toWorldObject() {
+    return {
+      objectId: this.objectId,
+      x: this.player.x,
+      y: this.player.y,
+      spriteId: this.spriteId,
+      spriteSize: SpriteSize.values.TALL_16x32,
+      isSolid: false,
+    };
+  }
+
+  isSkillResource() {
+    return false;
   }
 }

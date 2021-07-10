@@ -89,7 +89,10 @@ setInterval(() => {
     });
 
     const updateObject = {
-      worldObject: worldObjects.get(player.currentMap),
+      worldObject: worldObjects.get(player.currentMap)
+                       .filter(
+                           worldObject => worldObject.objectId !=
+                               player.worldObject.objectId),
       currentMap: player.currentMap,
       inventory: player.inventory,
     };
