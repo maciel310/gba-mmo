@@ -1,6 +1,7 @@
 import Chest from './chest.mjs';
 import LumberjackNpc from './npcs/lumberjack.mjs';
 import MayorNpc from './npcs/mayor.mjs';
+import MinerNpc from './npcs/miner.mjs';
 import {MapLocation} from './proto.mjs';
 import {Item, Skill} from './proto.mjs';
 import Resource from './resource.mjs';
@@ -23,6 +24,7 @@ class WorldObjectTracker {
   spawnPermanentNpcs() {
     this.addObject(new MayorNpc(), MapLocation.values.TOWN);
     this.addObject(new LumberjackNpc(), MapLocation.values.LUMBER_RIDGE);
+    this.addObject(new MinerNpc(), MapLocation.values.VAR_ROCK);
   }
 
   spawnResources() {
