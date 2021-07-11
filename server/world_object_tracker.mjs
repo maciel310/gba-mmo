@@ -1,4 +1,5 @@
 import Chest from './chest.mjs';
+import FisherNpc from './npcs/fisher.mjs';
 import LumberjackNpc from './npcs/lumberjack.mjs';
 import MayorNpc from './npcs/mayor.mjs';
 import MinerNpc from './npcs/miner.mjs';
@@ -25,6 +26,7 @@ class WorldObjectTracker {
     this.addObject(new MayorNpc(), MapLocation.values.TOWN);
     this.addObject(new LumberjackNpc(), MapLocation.values.LUMBER_RIDGE);
     this.addObject(new MinerNpc(), MapLocation.values.VAR_ROCK);
+    this.addObject(new FisherNpc(), MapLocation.values.LUMBER_RIDGE);
   }
 
   spawnResources() {
@@ -56,6 +58,17 @@ class WorldObjectTracker {
       };
       this.addObject(new Resource(treeConfig), MapLocation.values.LUMBER_RIDGE);
     }
+
+    const fishingConfig = {
+      spriteIds: [224, 224],
+      position: {x: 136, y: 384},
+      regenTicks: 1,
+      skillType: Skill.values.FISHING,
+      itemType: Item.values.RAW_FISH,
+      requiredItem: Item.values.ROD,
+    };
+    this.addObject(
+        new Resource(fishingConfig), MapLocation.values.LUMBER_RIDGE);
 
     // Var Rock
     const rocks = [
