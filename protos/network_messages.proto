@@ -60,6 +60,7 @@ enum Skill {
   UNKNOWN_SKILL = 0;
   WOODCUTTING = 1;
   MINING = 2;
+  FISHING = 3;
 }
 
 message SkillStats {
