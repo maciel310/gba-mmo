@@ -8,7 +8,7 @@ message ServerUpdate {
 
   repeated uint32 removed_world_object_ids = 10;
 
-  optional string network_message = 2 [(nanopb).max_size = 90];
+  optional string network_message = 2 [(nanopb).max_size = 97];
 
   repeated SkillStats skill_stats = 3;
 
