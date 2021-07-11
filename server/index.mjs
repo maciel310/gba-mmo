@@ -7,7 +7,7 @@ import worldObjectTracker from './world_object_tracker.mjs';
 
 const server = createSocket('udp4');
 
-const TICK_INTERVAL_MS = 1000 / 10;
+const TICK_INTERVAL_MS = 1000 / 5;
 
 // Map of UDP client info to last-seen timestamp.
 const clientList = new Map();
