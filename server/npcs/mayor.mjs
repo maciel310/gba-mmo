@@ -31,17 +31,17 @@ export default class MayorNpc extends Npc {
 
     switch (player.npcState[NPC_TYPE].conversation) {
       case ConversationStates.FIRST_WELCOME_1:
-        return 'Welcome! Take a look around the town. There\'s a bank chest to the west,';
+        return 'Welcome! Take a look around the town. There\'s\na bank chest to the west, and portals to';
       case ConversationStates.FIRST_WELCOME_2:
-        return 'and portals to Lumber Ridge and Var Rock to the east.';
+        return 'Lumber Ridge and Var Rock to the east.';
       case ConversationStates.QUEST_START_1:
-        return 'If it isn\'t too much trouble, could you help me out? I could really use some Wood and';
+        return 'If it isn\'t too much trouble, could you help me\nout? I could really use some Wood and Rock.';
       case ConversationStates.QUEST_START_2:
-        return 'Rock. I\'ll reward you handsomely for your trouble!';
+        return 'I\'ll reward you handsomely for your trouble!';
       case ConversationStates.QUEST_NEED_WOOD:
-        return 'You can find Wood by cutting down a tree in Lumber Ridge.';
+        return 'You can find Wood by cutting down a tree in\nLumber Ridge.';
       case ConversationStates.QUEST_NEED_ROCK:
-        return 'There\'s and old quarry in Var Rock where you could gather some Rock.';
+        return 'There\'s and old quarry in Var Rock where you\ncould gather some Rock.';
       case ConversationStates.QUEST_COMPLETED:
         return 'Excellent! You\'ve brought me the supplies. Take this as a thank you! (Received XXXXX)';
       case ConversationStates.AFTER_QUEST:
