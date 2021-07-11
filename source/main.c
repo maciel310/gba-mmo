@@ -21,10 +21,11 @@ OBJ_ATTR sprite[128];
 s32 worldX = 0;
 s32 worldY = 0;
 
-u8 skillSpriteLut[_Skill_ARRAYSIZE] = {
+u32 skillSpriteLut[_Skill_ARRAYSIZE] = {
   0, // Skill_UNKNOWN_SKILL
-  224, // Skill_WOODCUTTING
-  232, // Skill_MINING
+  256, // Skill_WOODCUTTING
+  264, // Skill_MINING
+  272, // Skill_FISHING
 };
 
 void initialize_sprites() {
@@ -38,9 +39,11 @@ void initialize_sprites() {
   dma3_cpy(&tile_mem[4][128], chestTiles, chestTilesLen);
   dma3_cpy(&tile_mem[4][160], rock1Tiles, rock1TilesLen);
   dma3_cpy(&tile_mem[4][192], rock2Tiles, rock2TilesLen);
+  dma3_cpy(&tile_mem[4][224], fishing_spotTiles, fishing_spotTilesLen);
 
   dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_WOODCUTTING]], axeTiles, axeTilesLen);
   dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_MINING]], pickTiles, pickTilesLen);
+  dma3_cpy(&tile_mem[4][skillSpriteLut[Skill_FISHING]], rodTiles, rodTilesLen);
 }
 
 u8 itemSpriteLut[_Item_ARRAYSIZE] = {
@@ -84,7 +87,7 @@ typedef struct {
 } Player;
 Player p;
 
-s32 skill_levels[_Skill_ARRAYSIZE] = {-1, -1, -1};
+s32 skill_levels[_Skill_ARRAYSIZE] = {-1, -1, -1, -1};
 
 s32 bank[_Item_ARRAYSIZE] = {0, 0, 0, 0, 0};
 
@@ -338,10 +341,13 @@ void show_skill_stats() {
 
   char buffer[8];
   sprintf(buffer, "Level %d", skill_levels[Skill_WOODCUTTING]);
-  tte_write_ex(50, 50, buffer, NULL);
+  tte_write_ex(50, 42, buffer, NULL);
 
   sprintf(buffer, "Level %d", skill_levels[Skill_MINING]);
-  tte_write_ex(50, 100, buffer, NULL);
+  tte_write_ex(50, 82, buffer, NULL);
+
+  sprintf(buffer, "Level %d", skill_levels[Skill_FISHING]);
+  tte_write_ex(50, 122, buffer, NULL);
 }
 
 void show_inventory_sprite(OBJ_ATTR* menu_sprite, u32 i, u32 row, u32 col, Item item) {
