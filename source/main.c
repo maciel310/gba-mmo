@@ -49,6 +49,9 @@ u8 itemSpriteLut[_Item_ARRAYSIZE] = {
   64, // ROCK
   96, // HATCHET
   128, // PICKAXE
+  160, // ROD
+  192, // RAW_FISH
+  224, // COOKED_FISH
 };
 
 #define MENU_OUTLINE_32_SPRITE 0
@@ -62,6 +65,9 @@ void initialize_menu_sprites() {
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_ROCK]], rockTiles, rockTilesLen);
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_HATCHET]], hatchetTiles, hatchetTilesLen);
   dma3_cpy(&tile_mem[4][itemSpriteLut[Item_PICKAXE]], pickaxeTiles, pickaxeTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_ROD]], fishing_rodTiles, fishing_rodTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_RAW_FISH]], fish_rawTiles, fish_rawTilesLen);
+  dma3_cpy(&tile_mem[4][itemSpriteLut[Item_COOKED_FISH]], fish_cookedTiles, fish_cookedTilesLen);
 }
 
 // NOTE: If updated change in proto and server code.

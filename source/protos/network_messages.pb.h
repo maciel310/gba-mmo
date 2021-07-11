@@ -37,7 +37,10 @@ typedef enum _Item {
     Item_WOOD = 1, 
     Item_ROCK = 2, 
     Item_HATCHET = 3, 
-    Item_PICKAXE = 4 
+    Item_PICKAXE = 4, 
+    Item_ROD = 5, 
+    Item_RAW_FISH = 6, 
+    Item_COOKED_FISH = 7 
 } Item;
 
 typedef enum _Interface { 
@@ -117,8 +120,8 @@ typedef struct _ServerUpdate {
 #define _Skill_ARRAYSIZE ((Skill)(Skill_MINING+1))
 
 #define _Item_MIN Item_UNKNOWN_ITEM
-#define _Item_MAX Item_PICKAXE
-#define _Item_ARRAYSIZE ((Item)(Item_PICKAXE+1))
+#define _Item_MAX Item_COOKED_FISH
+#define _Item_ARRAYSIZE ((Item)(Item_COOKED_FISH+1))
 
 #define _Interface_MIN Interface_UNKNOWN_INTERFACE
 #define _Interface_MAX Interface_BANK
