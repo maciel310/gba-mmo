@@ -26,7 +26,9 @@ export default class Player {
 
   inventory = [];
   bank = {};
+  coins;
   bankChanged = true;
+  coinsChanged = true;
 
   resourceInteraction = undefined;
 
@@ -51,6 +53,7 @@ export default class Player {
     p.hasPositionUpdate = true;
     p.playerToken = playerToken;
     p.inventory = playerObject.inventory;
+    p.coins = playerObject.coins || 0;
     Object.assign(p.npcState, playerObject.npcState);
     Object.assign(p.bank, playerObject.bank);
 
@@ -74,6 +77,7 @@ export default class Player {
       y: 240,
       currentMap: MapLocation.values.TOWN,
       inventory: [],
+      coins: 0,
     };
     Object.values(Skill.values).forEach(skill => {
       if (skill == Skill.values.UNKNOWN_SKILL) {
@@ -185,6 +189,25 @@ export default class Player {
     this.savePlayerStatus({inventory: this.inventory});
   }
 
+  takeItem(itemType) {
+    const itemIndex = this.inventory.indexOf(itemType);
+    if (itemIndex == -1) {
+      return;
+    }
+
+    this.inventory.splice(itemIndex, 1);
+    this.savePlayerStatus({inventory: this.inventory});
+  }
+
+  updateCoins(delta) {
+    if (this.coins + delta < 0) {
+      return;
+    }
+
+    this.coins += delta;
+    this.savePlayerStatus({coins: this.coins});
+  }
+
   bankInventoryItem(index) {
     if (this.inventory[index] == undefined) {
       return;
@@ -226,6 +249,9 @@ export default class Player {
     if (this.changes) {
       if (this.changes.hasOwnProperty('bank')) {
         this.bankChanged = true;
+      }
+      if (this.changes.hasOwnProperty('coins')) {
+        this.coinsChanged = true;
       }
 
       const playerObject = await getPlayer(this.playerToken);

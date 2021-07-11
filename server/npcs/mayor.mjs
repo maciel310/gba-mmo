@@ -43,7 +43,7 @@ export default class MayorNpc extends Npc {
       case ConversationStates.QUEST_NEED_ROCK:
         return 'There\'s and old quarry in Var Rock where you\ncould gather some Rock.';
       case ConversationStates.QUEST_COMPLETED:
-        return 'Excellent! You\'ve brought me the supplies. Take this as a thank you! (Received XXXXX)';
+        return 'Excellent! You\'ve brought me the supplies.\nHere\'s 1,000 coins as a thank you.';
       case ConversationStates.AFTER_QUEST:
         return 'Thanks again for your help!';
     }
@@ -77,6 +77,10 @@ export default class MayorNpc extends Npc {
       // TODO: Take items from inventory and grant quest reward.
       currentState.questCompleted = true;
       currentState.conversation = ConversationStates.QUEST_COMPLETED;
+
+      player.takeItem(Item.values.ROCK);
+      player.takeItem(Item.values.WOOD);
+      player.updateCoins(1000);
     } else {
       currentState.conversation = ConversationStates.AFTER_QUEST;
     }

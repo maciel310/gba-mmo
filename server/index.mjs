@@ -138,6 +138,10 @@ setInterval(() => {
       updateObject.bank = player.encodeBank();
       player.bankChanged = false;
     }
+    if (player.coinsChanged) {
+      updateObject.coinCount = player.coins;
+      player.coinsChanged = false;
+    }
 
     // TODO: Limit update size to 512 bytes per UDP message.
     const update = ServerUpdate.encode(updateObject).finish();
