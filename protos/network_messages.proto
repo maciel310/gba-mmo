@@ -26,6 +26,8 @@ message ServerUpdate {
 
   // Key is the Item enum numeric value, value is the quantity of that item.
   repeated BankEntry bank = 9;
+
+  optional int32 coin_count = 11;
 }
 
 enum Direction {
