@@ -8,19 +8,41 @@ struct world_object* world_object_head = NULL;
 
 bool sprite_collision_map[64][64];
 
-struct world_object* convert_world_object(WorldObject o) {
-  struct world_object* new_object = (struct world_object*) malloc(sizeof(struct world_object));
-  new_object->object_id = o.object_id;
-  new_object->x = o.x;
-  new_object->y = o.y;
-  new_object->dest_x = o.x;
-  new_object->dest_y = o.y;
-  new_object->sprite_id = o.sprite_id;
-  new_object->sprite_size = o.sprite_size;
-  new_object->is_solid = o.is_solid;
-  new_object->next = NULL;
+void convert_world_object(WorldObject proto_object, struct world_object* struct_object) {
+  struct_object->object_id = proto_object.object_id;
+  struct_object->sprite_id = proto_object.sprite_id;
+  struct_object->sprite_size = proto_object.sprite_size;
+  struct_object->is_solid = proto_object.is_solid;
 
-  return new_object;
+  if (abs(struct_object->dest_y - proto_object.y) > 32 ||
+      abs(struct_object->dest_x - proto_object.x) > 32) {
+    struct_object->x = proto_object.x;
+    struct_object->y = proto_object.y;
+  }
+  struct_object->dest_x = proto_object.x;
+  struct_object->dest_y = proto_object.y;
+}
+
+void remove_world_object(u32 id) {
+  struct world_object* current = world_object_head;
+  struct world_object* previous = NULL;
+  while (current != NULL) {
+    if (current->object_id == id) {
+      struct world_object* to_delete = current;
+
+      if (previous == NULL) {
+        world_object_head = current->next;
+      } else {
+        previous->next = current->next;
+      }
+
+      free(to_delete);
+      return;
+    }
+
+    previous = current;
+    current = current->next;
+  }
 }
 
 void clear_all_world_objects() {
@@ -36,7 +58,9 @@ void clear_all_world_objects() {
 
 bool update_world_object(WorldObject o) {
   if (world_object_head == NULL) {
-    world_object_head = convert_world_object(o);
+    world_object_head = (struct world_object*) malloc(sizeof(struct world_object));
+    convert_world_object(o, world_object_head);
+    world_object_head->next = NULL;
     return true;
   }
 
@@ -44,12 +68,14 @@ bool update_world_object(WorldObject o) {
   struct world_object* previous = NULL;
   while (current != NULL) {
     if (current->object_id == o.object_id) {
+      convert_world_object(o, current);
       current->dest_x = o.x;
       current->dest_y = o.y;
       current->sprite_id = o.sprite_id;
       return false;
     } else if (current->object_id > o.object_id) {
-      struct world_object* new_object = convert_world_object(o);
+      struct world_object* new_object = (struct world_object*) malloc(sizeof(struct world_object));
+      convert_world_object(o, new_object);
       if (previous == NULL) {
         world_object_head = new_object;
       } else {
@@ -63,7 +89,10 @@ bool update_world_object(WorldObject o) {
     current = current->next;
   }
 
-  previous->next = convert_world_object(o);
+  struct world_object* new_object = (struct world_object*) malloc(sizeof(struct world_object));
+  convert_world_object(o, new_object);
+  new_object->next = NULL;
+  previous->next = new_object;
   return true;
 }
 

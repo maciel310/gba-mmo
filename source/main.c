@@ -266,6 +266,11 @@ void world_object_received(WorldObject w) {
   new_world_object_received = new_world_object_received | is_new;
 }
 
+void world_object_removed(u32 id) {
+  remove_world_object(id);
+  new_world_object_received = true;
+}
+
 void load_assets_main() {
   if (current_map == MapLocation_LUMBER_RIDGE) {
     dma3_cpy(&tile_mem[1], lumber_ridge_mapTiles, lumber_ridge_mapTilesLen);
@@ -588,7 +593,7 @@ int main() {
   irq_enable(II_VBLANK);
 
   oam_init(sprite, 128);
-  serial_init(update_state_with_server_update, show_skill_update, world_object_received, update_bank);
+  serial_init(update_state_with_server_update, show_skill_update, world_object_received, world_object_removed, update_bank);
   text_init();
 
   load_assets_connecting();
@@ -669,6 +674,9 @@ int main() {
 
       i++;
       current = current->next;
+    }
+    for (; i < 128; i++) {
+      obj_hide(&sprite[i]);
     }
 
     if (new_world_object_received || solid_world_object_moved) {

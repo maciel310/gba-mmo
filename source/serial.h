@@ -11,6 +11,7 @@ void serial_init(
     void (*server_update_callback)(ServerUpdate),
     void (*skill_stats_callback)(SkillStats),
     void (*world_object_callback)(WorldObject),
+    void (*world_object_removed_callback)(u32),
     void (*bank_update_callback)(BankEntry));
 bool decode_world_object(pb_istream_t *stream, const pb_field_t *field, void **arg);
 void handle_serial();
