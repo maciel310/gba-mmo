@@ -106,6 +106,7 @@ setInterval(() => {
                        .filter(
                            worldObject => worldObject.objectId !=
                                player.worldObject.objectId),
+      removedWorldObjectIds: worldObjectTracker.availableIds,
       currentMap: player.currentMap,
       inventory: player.inventory,
     };
