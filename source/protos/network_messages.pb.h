@@ -81,7 +81,7 @@ typedef struct _SkillStats {
 typedef struct _ServerUpdate { 
     pb_callback_t world_object; 
     bool has_network_message;
-    char network_message[90]; 
+    char network_message[97]; 
     pb_callback_t skill_stats; 
     bool has_player_status;
     PlayerStatus player_status; 
