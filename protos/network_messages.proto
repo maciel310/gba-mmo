@@ -6,6 +6,8 @@ import "world_object.proto";
 message ServerUpdate {
   repeated WorldObject world_object = 1;
 
+  repeated uint32 removed_world_object_ids = 10;
+
   optional string network_message = 2 [(nanopb).max_size = 90];
 
   repeated SkillStats skill_stats = 3;
