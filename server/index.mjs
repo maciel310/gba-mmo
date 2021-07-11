@@ -69,7 +69,7 @@ teleporters.set(MapLocation.values.TOWN, [
       200, 224),
   new Teleporter(
       432, 344, 32, 32, MapLocation.values.TOWN,
-      MapLocation.values.LUMBER_RIDGE, 224, 224),
+      MapLocation.values.LUMBER_RIDGE, 256, 224),
 ]);
 teleporters.set(MapLocation.values.VAR_ROCK, [
   new Teleporter(
@@ -78,7 +78,7 @@ teleporters.set(MapLocation.values.VAR_ROCK, [
 ]);
 teleporters.set(MapLocation.values.LUMBER_RIDGE, [
   new Teleporter(
-      168, 224, 32, 32, MapLocation.values.LUMBER_RIDGE,
+      248, 192, 32, 32, MapLocation.values.LUMBER_RIDGE,
       MapLocation.values.TOWN, 392, 336),
 ]);
 

@@ -2,7 +2,7 @@ import Npc from '../npc.mjs';
 import {Item} from '../proto.mjs';
 
 const config = {
-  'spawnPoints': [{'x': 200, 'y': 200}],
+  'spawnPoints': [{'x': 328, 'y': 248}],
   'wanderRadius': 16,
   'speed': 1,
   'spriteId': 16,
