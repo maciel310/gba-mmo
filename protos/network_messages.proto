@@ -74,6 +74,9 @@ enum Item {
   ROCK = 2;
   HATCHET = 3;
   PICKAXE = 4;
+  ROD = 5;
+  RAW_FISH = 6;
+  COOKED_FISH = 7;
 }
 
 enum Interface {
