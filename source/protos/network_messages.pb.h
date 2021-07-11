@@ -98,6 +98,8 @@ typedef struct _ServerUpdate {
     pb_callback_t bank; 
     /* Key is the Item enum numeric value, value is the quantity of that item. */
     pb_callback_t removed_world_object_ids; 
+    bool has_coin_count;
+    int32_t coin_count; 
 } ServerUpdate;
 
 
@@ -128,11 +130,11 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
+#define ServerUpdate_init_default                {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_default, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}, {{NULL}, NULL}, false, 0}
 #define PlayerStatus_init_default                {false, 0, false, 0, false, _Direction_MIN, false, 0, false, 0, false, _Item_MIN}
 #define SkillStats_init_default                  {false, _Skill_MIN, false, 0, false, 0}
 #define BankEntry_init_default                   {false, _Item_MIN, false, 0}
-#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
+#define ServerUpdate_init_zero                   {{{NULL}, NULL}, false, "", {{NULL}, NULL}, false, PlayerStatus_init_zero, false, _Skill_MIN, false, _MapLocation_MIN, 0, {_Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN, _Item_MIN}, false, _Interface_MIN, {{NULL}, NULL}, {{NULL}, NULL}, false, 0}
 #define PlayerStatus_init_zero                   {false, 0, false, 0, false, _Direction_MIN, false, 0, false, 0, false, _Item_MIN}
 #define SkillStats_init_zero                     {false, _Skill_MIN, false, 0, false, 0}
 #define BankEntry_init_zero                      {false, _Item_MIN, false, 0}
@@ -159,6 +161,7 @@ extern "C" {
 #define ServerUpdate_launch_interface_tag        8
 #define ServerUpdate_bank_tag                    9
 #define ServerUpdate_removed_world_object_ids_tag 10
+#define ServerUpdate_coin_count_tag              11
 
 /* Struct field encoding specification for nanopb */
 #define ServerUpdate_FIELDLIST(X, a) \
@@ -171,7 +174,8 @@ X(a, STATIC,   OPTIONAL, UENUM,    current_map,       6) \
 X(a, STATIC,   REPEATED, UENUM,    inventory,         7) \
 X(a, STATIC,   OPTIONAL, UENUM,    launch_interface,   8) \
 X(a, CALLBACK, REPEATED, MESSAGE,  bank,              9) \
-X(a, CALLBACK, REPEATED, UINT32,   removed_world_object_ids,  10)
+X(a, CALLBACK, REPEATED, UINT32,   removed_world_object_ids,  10) \
+X(a, STATIC,   OPTIONAL, INT32,    coin_count,       11)
 #define ServerUpdate_CALLBACK pb_default_field_callback
 #define ServerUpdate_DEFAULT NULL
 #define ServerUpdate_world_object_MSGTYPE WorldObject

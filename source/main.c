@@ -74,6 +74,7 @@ typedef struct {
   s32 dest_y;
   Direction d;
   Item inventory[INVENTORY_SIZE];
+  s32 coin_count;
 } Player;
 Player p;
 
@@ -258,6 +259,10 @@ void update_state_with_server_update(ServerUpdate s) {
   for (u32 i = 0; i < INVENTORY_SIZE; i++) {
     p.inventory[i] = s.inventory[i];
   }
+
+  if (s.has_coin_count) {
+    p.coin_count = s.coin_count;
+  }
 }
 
 bool new_world_object_received = false;
@@ -373,6 +378,12 @@ void update_inventory(OBJ_ATTR* menu_sprite) {
   }
 }
 
+void show_coin_count() {
+  char coin_buffer[20];
+  sprintf(coin_buffer, "%d coins", p.coin_count);
+  tte_write_ex(20, 144, coin_buffer, NULL);
+}
+
 void show_bank_withdraw() {
   load_assets_bank_withdraw();
   initialize_menu_sprites();
@@ -394,6 +405,8 @@ void update_bank_withdraw(OBJ_ATTR* menu_sprite) {
       obj_hide(&menu_sprite[itemIndex]);
     }
   }
+
+  show_coin_count();
 }
 
 void show_bank_deposit() {
@@ -414,6 +427,8 @@ void update_bank_deposit(OBJ_ATTR* menu_sprite) {
       }
     }
   }
+
+  show_coin_count();
 }
 
 typedef enum _menu_type { 
