@@ -1,0 +1,91 @@
+syntax = "proto2";
+
+import "nanopb.proto";
+import "world_object.proto";
+
+message ServerUpdate {
+  repeated WorldObject world_object = 1;
+
+  repeated uint32 removed_world_object_ids = 10;
+
+  optional string network_message = 2 [(nanopb).max_size = 97];
+
+  repeated SkillStats skill_stats = 3;
+
+  // Only filled out on initial connection to server, or if server-side change of player location.
+  optional PlayerStatus player_status = 4;
+
+  optional Skill interacting_skill = 5;
+
+  optional MapLocation current_map = 6;
+
+  // NOTE: If max_count is updated change in server and ROM.
+  repeated Item inventory = 7 [(nanopb).max_count = 18];
+
+  optional Interface launch_interface = 8;
+
+  // Key is the Item enum numeric value, value is the quantity of that item.
+  repeated BankEntry bank = 9;
+
+  optional int32 coin_count = 11;
+}
+
+enum Direction {
+  UNKNOWN_DIRECTION = 0;
+  UP = 1;
+  DOWN = 2;
+  LEFT = 3;
+  RIGHT = 4;
+}
+
+enum MapLocation {
+  UNKNOWN_MAP = 0;
+  LUMBER_RIDGE = 1;
+  VAR_ROCK = 2;
+  TOWN = 3;
+}
+
+message PlayerStatus {
+  optional int32 x = 1;
+  optional int32 y = 2;
+  optional Direction direction = 3;
+  optional int32 interaction_object_id = 4;
+
+  // Bank operations.
+  optional int32 deposit_inventory_index = 5;
+  optional Item withdraw_bank_item = 6;
+}
+
+enum Skill {
+  UNKNOWN_SKILL = 0;
+  WOODCUTTING = 1;
+  MINING = 2;
+  FISHING = 3;
+}
+
+message SkillStats {
+  optional Skill skill = 1;
+  optional int32 level = 2;
+  optional int32 exp = 3;
+}
+
+enum Item {
+  UNKNOWN_ITEM = 0;
+  WOOD = 1;
+  ROCK = 2;
+  HATCHET = 3;
+  PICKAXE = 4;
+  ROD = 5;
+  RAW_FISH = 6;
+  COOKED_FISH = 7;
+}
+
+enum Interface {
+  UNKNOWN_INTERFACE = 0;
+  BANK = 1;
+}
+
+message BankEntry {
+  optional Item item = 1;
+  optional int32 quantity = 2;
+}
