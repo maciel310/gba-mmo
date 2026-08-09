@@ -173,12 +173,12 @@ menu_sprites.s menu_sprites.h : sprites.grit $(MENU_SPRITES)
 
 ## Merge all headers into a single large one for easier including.
 define master-header	# $1 : master path, $2 separate header paths
-	echo "//\n// $(notdir $(strip $1))\n//" > $1
+	printf '//\n// %s\n//\n' "$(notdir $(strip $1))" > $1
 	echo "// One header to rule them and in the darkness bind them" >> $1
-	echo "// Date: $(shell date +'%F %X' )\n" >> $1
-	echo "#ifdef __cplusplus\nextern \"C\" {\n#endif" >> $1
+	printf '// Date: %s\n\n' "$(shell date +'%F %X' )" >> $1
+	printf '#ifdef __cplusplus\nextern "C" {\n#endif\n' >> $1
 	cat $2 >> $1
-	echo "\n#ifdef __cplusplus\n};\n#endif\n" >> $1
+	printf '\n#ifdef __cplusplus\n};\n#endif\n' >> $1
 endef
 
 ## if you just want to include the separate headers, use this instead of cat:

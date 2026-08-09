@@ -21,7 +21,7 @@ LIBTONC := $(DEVKITPRO)/libtonc
 # the makefile is found
 #
 #---------------------------------------------------------------------------------
-TARGET		:= $(notdir $(CURDIR))_mb
+TARGET		:= gba-mmo_mb
 BUILD		:= build
 SOURCES		:= source source/protos include/nanopb
 INCLUDES	:= include
@@ -33,7 +33,8 @@ MUSIC		:=
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -O2\
+CFLAGS	:=	-g -Wall -O2 -std=gnu17\
+		-ffunction-sections -fdata-sections\
 		-mcpu=arm7tdmi -mtune=arm7tdmi\
 		$(ARCH)
 
@@ -42,7 +43,7 @@ CFLAGS	+=	$(INCLUDE)
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-g $(ARCH) -Wl,--gc-sections -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -106,7 +107,7 @@ export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-					-I$(CURDIR)/$(BUILD) -I/gba/include/nanopb
+					-I$(CURDIR)/$(BUILD) -I$(CURDIR)/include/nanopb
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
